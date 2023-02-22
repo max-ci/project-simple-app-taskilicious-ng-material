@@ -1,9 +1,11 @@
-import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
-import { ActivatedRoute, Params } from '@angular/router';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { switchMap, take } from 'rxjs/operators';
+import { ChangeDetectionStrategy, Component, OnDestroy, ViewEncapsulation } from '@angular/core';
+import { ActivatedRoute, Params, Router } from '@angular/router';
+import { BehaviorSubject, Observable, Subject, combineLatest } from 'rxjs';
+import { catchError, map, switchMap, take, takeUntil, tap } from 'rxjs/operators';
 import { CategoryModel } from '../../models/category.model';
+import { TaskModel } from '../../models/task.model';
 import { CategoryService } from '../../services/category.service';
+import { TaskService } from '../../services/task.service';
 
 @Component({
   selector: 'app-category-detail',
@@ -12,17 +14,77 @@ import { CategoryService } from '../../services/category.service';
   encapsulation: ViewEncapsulation.Emulated,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CategoryDetailComponent {
-  private _loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
-  public loading$: Observable<boolean> = this._loadingSubject.asObservable();
+export class CategoryDetailComponent implements OnDestroy {
+  private _destroySubject: Subject<void> = new Subject<void>();
+
+  private _loadingCategorySubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+  public loadingCategory$: Observable<boolean> = this._loadingCategorySubject.asObservable();
+
+  private _loadingTasksSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
+  public loadingTasks$: Observable<boolean> = this._loadingTasksSubject.asObservable();
 
   readonly category$: Observable<CategoryModel> = this._activatedRoute.params.pipe(
-    take(1),
     switchMap((params: Params) => this._categoryService.getOne(params['id'])),
+    take(1),
     tap(() => {
-      this._loadingSubject.next(false);
+      this._loadingCategorySubject.next(false);
     })
   );
 
-  constructor(private _activatedRoute: ActivatedRoute, private _categoryService: CategoryService) {}
+  private readonly _tasks$: Observable<TaskModel[]> = combineLatest([
+    this._activatedRoute.params,
+    this._taskService.getAll(),
+  ]).pipe(
+    takeUntil(this._destroySubject),
+    map(([params, tasks]: [Params, TaskModel[]]) =>
+      tasks.filter((task) => task.categoryId === params['id'])
+    ),
+    tap(() => {
+      this._loadingTasksSubject.next(false);
+    })
+  );
+
+  private _refreshTaskSubject: BehaviorSubject<void> = new BehaviorSubject<void>(void 0);
+  public refreshTask$: Observable<void> = this._refreshTaskSubject.asObservable();
+
+  readonly refreshedTasks$: Observable<TaskModel[]> = this.refreshTask$.pipe(
+    switchMap(() => this._tasks$)
+  );
+
+  constructor(
+    private _activatedRoute: ActivatedRoute,
+    private _categoryService: CategoryService,
+    private _taskService: TaskService,
+    private _router: Router
+  ) {}
+
+  ngOnDestroy(): void {
+    this._destroySubject.next();
+    this._destroySubject.complete();
+  }
+
+  deleteTask(id: string): void {
+    this._taskService
+      .delete(id)
+      .pipe(
+        take(1),
+        catchError((err) => {
+          throw err;
+        })
+      )
+      .subscribe(() => this._refreshTaskSubject.next());
+  }
+
+  redirectToCreateTaskWithCategoryId(): void {
+    this._activatedRoute.params
+      .pipe(
+        take(1),
+        map((params: Params) => {
+          this._router.navigate(['tasks/create'], {
+            queryParams: { initialCategoryId: params['id'] },
+          });
+        })
+      )
+      .subscribe();
+  }
 }
