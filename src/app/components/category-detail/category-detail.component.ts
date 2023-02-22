@@ -23,6 +23,9 @@ export class CategoryDetailComponent implements OnDestroy {
   private _loadingTasksSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
   public loadingTasks$: Observable<boolean> = this._loadingTasksSubject.asObservable();
 
+  private _loadingDeleteTask: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public loadingDeleteTask$: Observable<boolean> = this._loadingDeleteTask.asObservable();
+
   readonly category$: Observable<CategoryModel> = this._activatedRoute.params.pipe(
     switchMap((params: Params) => this._categoryService.getOne(params['id'])),
     take(1),
@@ -64,15 +67,20 @@ export class CategoryDetailComponent implements OnDestroy {
   }
 
   deleteTask(id: string): void {
+    this._loadingDeleteTask.next(true);
     this._taskService
       .delete(id)
       .pipe(
         take(1),
         catchError((err) => {
+          this._loadingDeleteTask.next(true);
           throw err;
         })
       )
-      .subscribe(() => this._refreshTaskSubject.next());
+      .subscribe(() => {
+        this._loadingDeleteTask.next(true);
+        this._refreshTaskSubject.next();
+      });
   }
 
   redirectToCreateTaskWithCategoryId(): void {
