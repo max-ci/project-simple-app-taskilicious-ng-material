@@ -14,7 +14,6 @@ import {
 import { CategoryModel } from '../../models/category.model';
 import { CategoryService } from '../../services/category.service';
 import { TaskService } from '../../services/task.service';
-import { TaskModel } from '../../models/task.model';
 
 @Component({
   selector: 'app-create-task',
@@ -67,9 +66,9 @@ export class CreateTaskComponent {
           throw err;
         })
       )
-      .subscribe((task: TaskModel) => {
+      .subscribe(() => {
         this._loadingSubject.next(false);
-        this._router.navigateByUrl(`/categories/${task.categoryId}`);
+        this._router.navigateByUrl(`/categories/${form.get('categoryId')?.value}`);
       });
   }
 }
