@@ -1,8 +1,7 @@
 import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { catchError, switchMap, take } from 'rxjs/operators';
+import { BehaviorSubject, Observable, tap, catchError, switchMap, take } from 'rxjs';
 import { CategoryService } from '../../services/category.service';
 import { CategoryModel } from '../../models/category.model';
 
@@ -20,8 +19,8 @@ export class EditCategoryComponent implements OnInit {
   public loading$: Observable<boolean> = this._loadingSubject.asObservable();
 
   private readonly _getInitialData$: Observable<CategoryModel> = this._activatedRoute.params.pipe(
-    take(1),
     switchMap((params: Params) => this._categoryService.getOne(params['id'])),
+    take(1),
     tap((data: CategoryModel) => {
       this.form.patchValue(data);
       this._loadingSubject.next(false);
@@ -42,8 +41,8 @@ export class EditCategoryComponent implements OnInit {
     this._loadingSubject.next(true);
     this._activatedRoute.params
       .pipe(
-        take(1),
         switchMap((params: Params) => this._categoryService.update(params['id'], form.value)),
+        take(1),
         catchError((err) => {
           this._loadingSubject.next(false);
           throw err;
