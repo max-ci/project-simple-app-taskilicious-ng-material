@@ -95,4 +95,8 @@ export class CategoryDetailComponent implements OnDestroy {
       )
       .subscribe();
   }
+
+  taskTrackBy(index: number, task: TaskModel): string {
+    return task.id;
+  }
 }

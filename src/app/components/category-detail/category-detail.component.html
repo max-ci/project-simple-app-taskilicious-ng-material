@@ -13,7 +13,12 @@
 </ng-container>
 
 <ng-container *ngIf="refreshedTasks$ | async as tasks">
-  <table *ngIf="tasks.length; else empty" mat-table [dataSource]="tasks" class="mat-elevation-z8">
+  <table
+    *ngIf="tasks.length; else empty"
+    mat-table
+    [dataSource]="tasks"
+    [trackBy]="taskTrackBy"
+    class="mat-elevation-z8">
     <ng-container matColumnDef="name">
       <th mat-header-cell *matHeaderCellDef>Name</th>
       <td mat-cell *matCellDef="let task">{{ task.name }}</td>
