@@ -18,6 +18,21 @@
       ><mat-error *ngIf="form.get('categoryId')!.invalid">categoryId is invalid</mat-error>
     </mat-form-field>
   </div>
+
+  <div formArrayName="teamMemberIds">
+    <div *ngFor="let teamMember of teamMembers$ | async; index as i" [formGroupName]="i">
+      <mat-checkbox [formControlName]="teamMember.id"
+        ><img width="24" src="{{ teamMember.avatar }}" [alt]="teamMember.name" />
+        {{ teamMember.name }}</mat-checkbox
+      >
+    </div>
+  </div>
+
+  <ng-container *ngIf="loadingTaskAndTeamMembers$ | async">
+    <mat-progress-spinner [color]="'primary'" [mode]="'indeterminate'" [value]="50" [diameter]="50">
+    </mat-progress-spinner>
+  </ng-container>
+
   <div>
     <button type="submit" mat-raised-button color="primary" [disabled]="form.invalid">
       Update
@@ -25,7 +40,7 @@
   </div>
 </form>
 
-<ng-container *ngIf="loading$ | async">
+<ng-container *ngIf="loadingUpdateTask$ | async">
   <mat-progress-spinner [color]="'primary'" [mode]="'indeterminate'" [value]="50" [diameter]="50">
   </mat-progress-spinner>
 </ng-container>
