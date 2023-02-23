@@ -4,12 +4,13 @@
   <div>
     <mat-form-field appearance="fill">
       <mat-label>Name</mat-label
-      ><input matInput type="text" placeholder="Name" formControlName="name" required /><mat-error
+      ><input matInput type="text" placeholder="Name" formControlName="name" /><mat-error
         *ngIf="form.get('name')!.invalid"
         >name is invalid</mat-error
       ></mat-form-field
     >
   </div>
+
   <div>
     <mat-form-field appearance="fill">
       <mat-label>Choose a category</mat-label>
@@ -20,6 +21,21 @@
       ><mat-error *ngIf="form.get('categoryId')!.invalid">categoryId is invalid</mat-error>
     </mat-form-field>
   </div>
+
+  <div formArrayName="teamMemberIds">
+    <div *ngFor="let teamMember of teamMembers$ | async; index as i" [formGroupName]="i">
+      <mat-checkbox [formControlName]="teamMember.id"
+        ><img width="24" src="{{ teamMember.avatar }}" [alt]="teamMember.name" />
+        {{ teamMember.name }}</mat-checkbox
+      >
+    </div>
+  </div>
+
+  <ng-container *ngIf="loadingTeamMembers$ | async">
+    <mat-progress-spinner [color]="'primary'" [mode]="'indeterminate'" [value]="50" [diameter]="50">
+    </mat-progress-spinner>
+  </ng-container>
+
   <div>
     <button type="submit" mat-raised-button color="primary" [disabled]="form.invalid">
       Create
@@ -27,7 +43,7 @@
   </div>
 </form>
 
-<ng-container *ngIf="loading$ | async">
+<ng-container *ngIf="loadingCreateTask$ | async">
   <mat-progress-spinner [color]="'primary'" [mode]="'indeterminate'" [value]="50" [diameter]="50">
   </mat-progress-spinner>
 </ng-container>
