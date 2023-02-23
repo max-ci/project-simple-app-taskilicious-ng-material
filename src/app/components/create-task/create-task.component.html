@@ -4,7 +4,7 @@
   <div>
     <mat-form-field appearance="fill">
       <mat-label>Name</mat-label
-      ><input matInput type="text" placeholder="Name" formControlName="name" /><mat-error
+      ><input matInput type="text" placeholder="Name" formControlName="name" required /><mat-error
         *ngIf="form.get('name')!.invalid"
         >name is invalid</mat-error
       ></mat-form-field
