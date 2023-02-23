@@ -25,8 +25,21 @@
     </ng-container>
 
     <ng-container matColumnDef="categoryId">
-      <th mat-header-cell *matHeaderCellDef>Category ID</th>
+      <th mat-header-cell *matHeaderCellDef>CategoryID</th>
       <td mat-cell *matCellDef="let task">{{ task.categoryId }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="teamMembers">
+      <th mat-header-cell *matHeaderCellDef>Team Members</th>
+      <td mat-cell *matCellDef="let task">
+        <ng-container *ngIf="task.teamMembers.length; else noTeamMembersAssigned">
+          <ng-container *ngFor="let teamMember of task.teamMembers">
+            <img [src]="teamMember.avatar" [alt]="teamMember.name" width="24" />
+          </ng-container>
+        </ng-container>
+
+        <ng-template #noTeamMembersAssigned> No team members assigned </ng-template>
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="updateTask">
@@ -41,25 +54,30 @@
     <ng-container matColumnDef="deleteTask">
       <th mat-header-cell *matHeaderCellDef>Remove</th>
       <td mat-cell *matCellDef="let task">
-        <ng-container *ngIf="!(loadingDeleteTask$ | async)">
+        <ng-container *ngIf="(loadingDeleteTask$ | async) !== task.id; else loadingDeleteTask">
           <button (click)="deleteTask(task.id)" mat-mini-fab><mat-icon>remove</mat-icon></button>
         </ng-container>
 
-        <ng-container *ngIf="loadingDeleteTask$ | async">
+        <ng-template #loadingDeleteTask>
           <mat-progress-spinner
             [color]="'primary'"
             [mode]="'indeterminate'"
             [value]="50"
             [diameter]="20">
           </mat-progress-spinner>
-        </ng-container>
+        </ng-template>
       </td>
     </ng-container>
 
-    <tr mat-header-row *matHeaderRowDef="['name', 'categoryId', 'updateTask', 'deleteTask']"></tr>
+    <tr
+      mat-header-row
+      *matHeaderRowDef="['name', 'categoryId', 'teamMembers', 'updateTask', 'deleteTask']"></tr>
     <tr
       mat-row
-      *matRowDef="let row; columns: ['name', 'categoryId', 'updateTask', 'deleteTask']"></tr>
+      *matRowDef="
+        let row;
+        columns: ['name', 'categoryId', 'teamMembers', 'updateTask', 'deleteTask']
+      "></tr>
   </table>
 </ng-container>
 
