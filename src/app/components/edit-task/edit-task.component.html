@@ -41,7 +41,9 @@
   </div>
 
   <div>
-    <button type="submit" mat-raised-button color="primary">Update</button>
+    <button type="submit" mat-raised-button color="primary" [disabled]="loadingUpdateTask$ | async">
+      Update
+    </button>
   </div>
 </form>
 
