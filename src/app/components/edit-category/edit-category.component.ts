@@ -38,6 +38,9 @@ export class EditCategoryComponent implements OnInit {
   }
 
   onFormSubmitted(form: FormGroup): void {
+    if (!form.valid) {
+      return;
+    }
     this._loadingSubject.next(true);
     this._activatedRoute.params
       .pipe(

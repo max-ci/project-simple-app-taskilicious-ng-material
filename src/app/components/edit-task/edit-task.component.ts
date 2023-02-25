@@ -111,6 +111,9 @@ export class EditTaskComponent {
   }
 
   onFormSubmitted(form: FormGroup): void {
+    if (!form.valid) {
+      return;
+    }
     this._loadingUpdateTaskSubject.next(true);
     const teamMemberIds: string[] = this.getAssignedTeamMembersToTask(form.value.teamMemberIds);
 
