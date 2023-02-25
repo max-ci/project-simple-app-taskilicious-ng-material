@@ -9,7 +9,7 @@ export class FileService {
     publicKey: environment.uploadCareApiKey,
   });
 
-  upload(fileData: any): Observable<UploadcareFile> {
+  upload(fileData: File): Observable<UploadcareFile> {
     return from(this._uploadClient.uploadFile(fileData));
   }
 }
