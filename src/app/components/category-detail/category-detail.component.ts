@@ -9,7 +9,6 @@ import {
   switchMap,
   take,
   takeUntil,
-  tap,
   catchError,
 } from 'rxjs';
 import { CategoryModel } from '../../models/category.model';
@@ -30,12 +29,6 @@ import { TaskWithTeamMembersModel } from '../../models/task-with-team-members.mo
 export class CategoryDetailComponent implements OnDestroy {
   private _destroySubject: Subject<void> = new Subject<void>();
 
-  private _loadingCategorySubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
-  public loadingCategory$: Observable<boolean> = this._loadingCategorySubject.asObservable();
-
-  private _loadingTasksSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
-  public loadingTasks$: Observable<boolean> = this._loadingTasksSubject.asObservable();
-
   private _loadingDeleteTask: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(
     null
   );
@@ -43,10 +36,7 @@ export class CategoryDetailComponent implements OnDestroy {
 
   readonly category$: Observable<CategoryModel> = this._activatedRoute.params.pipe(
     switchMap((params: Params) => this._categoryService.getOne(params['id'])),
-    take(1),
-    tap(() => {
-      this._loadingCategorySubject.next(false);
-    })
+    take(1)
   );
 
   private readonly _tasks$: Observable<TaskWithTeamMembersModel[]> = combineLatest([
@@ -67,10 +57,7 @@ export class CategoryDetailComponent implements OnDestroy {
 
           return { ...task, teamMembers: teamMembersAssignedToTask };
         })
-    ),
-    tap(() => {
-      this._loadingTasksSubject.next(false);
-    })
+    )
   );
 
   private _refreshTaskSubject: BehaviorSubject<void> = new BehaviorSubject<void>(void 0);
