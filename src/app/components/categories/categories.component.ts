@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { BehaviorSubject, Observable, Subject, combineLatest, of, tap, map } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, combineLatest, of, map } from 'rxjs';
 import { CategoryModel } from '../../models/category.model';
 import { CategoryService } from '../../services/category.service';
 import { OrderByName } from '../../enum/order-by-name.enum';
@@ -15,9 +15,6 @@ import { MatSelectChange } from '@angular/material/select';
 })
 export class CategoriesComponent {
   private _destroySubject: Subject<void> = new Subject<void>();
-
-  private _loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
-  public loading$: Observable<boolean> = this._loadingSubject.asObservable();
 
   private readonly _orderByNameDefaultValue: OrderByName = OrderByName.Asc;
 
@@ -38,10 +35,7 @@ export class CategoriesComponent {
           ? category2.name.localeCompare(category1.name)
           : category1.name.localeCompare(category2.name)
       )
-    ),
-    tap(() => {
-      this._loadingSubject.next(false);
-    })
+    )
   );
 
   constructor(private _categoryService: CategoryService) {}

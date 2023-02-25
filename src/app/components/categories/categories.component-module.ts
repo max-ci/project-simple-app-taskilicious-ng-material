@@ -8,8 +8,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { CategoriesComponent } from './categories.component';
-import { RouterLink } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCardModule } from '@angular/material/card';
 
 @NgModule({
   imports: [
@@ -17,12 +18,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatListModule,
     MatButtonModule,
     MatIconModule,
-    RouterLink,
     MatFormFieldModule,
     MatSelectModule,
     ReactiveFormsModule,
     MatOptionModule,
     MatProgressSpinnerModule,
+    MatCardModule,
+    RouterModule,
   ],
   declarations: [CategoriesComponent],
   providers: [],
