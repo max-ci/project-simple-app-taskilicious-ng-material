@@ -40,11 +40,6 @@ export class EditTaskComponent {
   private _loadingUpdateTaskSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loadingUpdateTask$: Observable<boolean> = this._loadingUpdateTaskSubject.asObservable();
 
-  private _loadingTaskAndTeamMembersSubject: BehaviorSubject<boolean> =
-    new BehaviorSubject<boolean>(true);
-  public loadingTaskAndTeamMembers$: Observable<boolean> =
-    this._loadingTaskAndTeamMembersSubject.asObservable();
-
   private _imageToUploadPreview: Subject<SafeUrl> = new Subject<SafeUrl>();
   public imageToUploadPreview$: Observable<SafeUrl> = this._imageToUploadPreview.asObservable();
 
@@ -70,8 +65,6 @@ export class EditTaskComponent {
           })
         );
       });
-
-      this._loadingTaskAndTeamMembersSubject.next(false);
 
       return teamMembers;
     })

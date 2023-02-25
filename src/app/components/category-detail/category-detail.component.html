@@ -1,24 +1,34 @@
-<ng-container *ngIf="loadingCategory$ | async">
-  <mat-progress-spinner [color]="'primary'" [mode]="'indeterminate'" [value]="50" [diameter]="50">
+<ng-template #loadingCategory>
+  <mat-progress-spinner
+    [color]="'primary'"
+    [mode]="'indeterminate'"
+    [value]="50"
+    [diameter]="30"
+    class="mb-1">
   </mat-progress-spinner>
-</ng-container>
+</ng-template>
 
-<ng-container *ngIf="category$ | async as category">
+<ng-container *ngIf="category$ | async as category; else loadingCategory">
   <h1>Welcome to category: {{ category['name'] }}</h1>
 </ng-container>
 
-<ng-container *ngIf="loadingTasks$ | async">
-  <mat-progress-spinner [color]="'primary'" [mode]="'indeterminate'" [value]="50" [diameter]="50">
+<ng-template #loadingTasks>
+  <mat-progress-spinner
+    [color]="'primary'"
+    [mode]="'indeterminate'"
+    [value]="50"
+    [diameter]="30"
+    class="mb-1">
   </mat-progress-spinner>
-</ng-container>
+</ng-template>
 
-<ng-container *ngIf="refreshedTasks$ | async as tasks">
+<ng-container *ngIf="refreshedTasks$ | async as tasks; else loadingTasks">
   <table
     *ngIf="tasks.length; else empty"
     mat-table
     [dataSource]="tasks"
     [trackBy]="taskTrackBy"
-    class="mat-elevation-z8">
+    class="mat-elevation-z1 mb-1 tasks-table">
     <ng-container matColumnDef="image">
       <th mat-header-cell *matHeaderCellDef>Image</th>
       <td mat-cell *matCellDef="let task">
@@ -26,7 +36,7 @@
           *ngIf="task.imageUrl; else noImage"
           [src]="task.imageUrl"
           [alt]="task.name"
-          width="50" />
+          class="tasks-table-image" />
         <ng-template #noImage>No image</ng-template>
       </td>
     </ng-container>
@@ -45,9 +55,11 @@
       <th mat-header-cell *matHeaderCellDef>Team Members</th>
       <td mat-cell *matCellDef="let task">
         <ng-container *ngIf="task.teamMembers.length; else noTeamMembersAssigned">
-          <ng-container *ngFor="let teamMember of task.teamMembers">
-            <img [src]="teamMember.avatar" [alt]="teamMember.name" width="24" />
-          </ng-container>
+          <div class="tasks-table-avatars">
+            <ng-container *ngFor="let teamMember of task.teamMembers">
+              <img [src]="teamMember.avatar" [alt]="teamMember.name" />
+            </ng-container>
+          </div>
         </ng-container>
 
         <ng-template #noTeamMembersAssigned> No team members assigned </ng-template>
@@ -57,7 +69,7 @@
     <ng-container matColumnDef="updateTask">
       <th mat-header-cell *matHeaderCellDef>Edit</th>
       <td mat-cell *matCellDef="let task">
-        <button mat-mini-fab routerLink="/tasks/edit/{{ task.id }}">
+        <button mat-mini-fab routerLink="/tasks/edit/{{ task.id }}" color="primary">
           <mat-icon>edit</mat-icon>
         </button>
       </td>
@@ -67,7 +79,9 @@
       <th mat-header-cell *matHeaderCellDef>Remove</th>
       <td mat-cell *matCellDef="let task">
         <ng-container *ngIf="(loadingDeleteTask$ | async) !== task.id; else loadingDeleteTask">
-          <button (click)="deleteTask(task.id)" mat-mini-fab><mat-icon>remove</mat-icon></button>
+          <button (click)="deleteTask(task.id)" mat-mini-fab color="warn">
+            <mat-icon>remove</mat-icon>
+          </button>
         </ng-container>
 
         <ng-template #loadingDeleteTask>
@@ -100,7 +114,7 @@
   </table>
 </ng-container>
 
-<ng-template #empty> <div>0 tasks</div> </ng-template>
+<ng-template #empty> <div class="empty-state mb-1">No tasks in this category.</div> </ng-template>
 
 <button mat-mini-fab (click)="redirectToCreateTaskWithCategoryId()">
   <mat-icon>add</mat-icon>

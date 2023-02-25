@@ -14,20 +14,38 @@
   </mat-form-field>
 
   <ng-container *ngIf="categories$ | async as categories; else loading">
-    <mat-list role="list" *ngIf="categories.length; else empty"
-      ><mat-list-item role="listitem" *ngFor="let item of categories"
-        ><a routerLink="/categories/{{ item.id }}">{{ item.name }}</a>
-        <mat-icon routerLink="/categories/edit/{{ item.id }}">edit</mat-icon>
-      </mat-list-item></mat-list
-    >
+    <mat-list role="list" *ngIf="categories.length; else empty" class="mb-1">
+      <ng-container *ngFor="let item of categories">
+        <mat-list-item role="listitem">
+          <div class="categories-list-item">
+            <a routerLink="/categories/{{ item.id }}" class="categories-list-item-link">{{
+              item.name
+            }}</a>
+            <a
+              mat-mini-fab
+              [color]="'primary'"
+              routerLink="/categories/edit/{{ item.id }}"
+              class="categories-list-item-edit">
+              <mat-icon>edit</mat-icon>
+            </a>
+          </div>
+        </mat-list-item>
+        <mat-divider></mat-divider>
+      </ng-container>
+    </mat-list>
   </ng-container>
 
   <ng-template #loading>
-    <mat-progress-spinner [color]="'primary'" [mode]="'indeterminate'" [value]="50" [diameter]="50">
+    <mat-progress-spinner
+      [color]="'primary'"
+      [mode]="'indeterminate'"
+      [value]="50"
+      [diameter]="30"
+      class="mb-1">
     </mat-progress-spinner>
   </ng-template>
 
-  <ng-template #empty> <div>0 categories</div> </ng-template>
+  <ng-template #empty> <div class="empty-state mb-1">No categories</div> </ng-template>
 
   <button mat-mini-fab routerLink="/categories/create"><mat-icon>add</mat-icon></button>
 </mat-card>

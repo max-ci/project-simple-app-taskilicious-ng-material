@@ -39,9 +39,6 @@ export class CreateTaskComponent {
   private _loadingCreateTaskSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loadingCreateTask$: Observable<boolean> = this._loadingCreateTaskSubject.asObservable();
 
-  private _loadingTeamMembersSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
-  public loadingTeamMembers$: Observable<boolean> = this._loadingTeamMembersSubject.asObservable();
-
   private _categoriesSubject: Subject<CategoryModel[]> = new Subject<CategoryModel[]>();
   public categories$: Observable<CategoryModel[]> = this._categoriesSubject.asObservable();
 
@@ -73,7 +70,6 @@ export class CreateTaskComponent {
             [teamMember.id]: new FormControl(),
           })
         );
-        this._loadingTeamMembersSubject.next(false);
       });
     })
   );

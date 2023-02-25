@@ -8,6 +8,7 @@ import { CreateTaskComponent } from './create-task.component';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatCardModule } from '@angular/material/card';
 
 @NgModule({
   imports: [
@@ -19,6 +20,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     MatSelectModule,
     MatProgressSpinnerModule,
     MatCheckboxModule,
+    MatCardModule,
   ],
   declarations: [CreateTaskComponent],
   providers: [],

@@ -1,0 +1,21 @@
+.edit-task {
+  &-image {
+    display: block;
+    width: 200px;
+    height: auto;
+  }
+
+  &-checkbox {
+    &-content {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    &-avatar {
+      width: 24px;
+      height: auto;
+      align-items: center;
+    }
+  }
+}

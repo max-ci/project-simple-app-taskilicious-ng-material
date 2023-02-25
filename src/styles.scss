@@ -41,3 +41,16 @@ body {
 .mb-1 {
   margin-bottom: 1rem;
 }
+
+.empty-state {
+  padding: 1rem;
+  border: 2px solid #eee;
+  text-align: center;
+  border-radius: 0.25rem;
+}
+
+.loader-inside-input {
+  position: absolute;
+  right: 5px;
+  top: 6px;
+}
