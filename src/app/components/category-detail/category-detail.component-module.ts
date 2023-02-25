@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { CategoryDetailComponent } from './category-detail.component';
 import { RouterLink } from '@angular/router';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   imports: [
@@ -16,6 +17,7 @@ import { RouterLink } from '@angular/router';
     MatIconModule,
     RouterLink,
     MatIconModule,
+    MatSnackBarModule,
   ],
   declarations: [CategoryDetailComponent],
   providers: [],

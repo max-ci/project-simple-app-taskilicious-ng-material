@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   imports: [
@@ -17,6 +18,7 @@ import { MatCardModule } from '@angular/material/card';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatCardModule,
+    MatSnackBarModule,
   ],
   declarations: [EditCategoryComponent],
   providers: [],

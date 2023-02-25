@@ -18,6 +18,7 @@ import { TaskService } from '../../services/task.service';
 import { TeamMemberService } from '../../services/team-member.service';
 import { TeamMemberModel } from '../../models/team-member.model';
 import { TaskWithTeamMembersModel } from '../../models/task-with-team-members.model';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-category-detail',
@@ -72,7 +73,8 @@ export class CategoryDetailComponent implements OnDestroy {
     private _categoryService: CategoryService,
     private _taskService: TaskService,
     private _teamMemberService: TeamMemberService,
-    private _router: Router
+    private _router: Router,
+    private _snackbar: MatSnackBar
   ) {}
 
   ngOnDestroy(): void {
@@ -94,6 +96,9 @@ export class CategoryDetailComponent implements OnDestroy {
       .subscribe(() => {
         this._loadingDeleteTask.next(null);
         this._refreshTaskSubject.next();
+        this._snackbar.open('Task deleted', undefined, {
+          duration: 3000,
+        });
       });
   }
 

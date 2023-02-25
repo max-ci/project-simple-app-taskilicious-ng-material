@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CreateCategoryComponent } from './create-category.component';
 import { MatCardModule } from '@angular/material/card';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   imports: [
@@ -17,6 +18,7 @@ import { MatCardModule } from '@angular/material/card';
     MatButtonModule,
     MatProgressSpinnerModule,
     MatCardModule,
+    MatSnackBarModule,
   ],
   declarations: [CreateCategoryComponent],
   providers: [],

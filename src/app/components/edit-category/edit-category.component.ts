@@ -4,6 +4,7 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import { BehaviorSubject, Observable, tap, catchError, switchMap, take } from 'rxjs';
 import { CategoryService } from '../../services/category.service';
 import { CategoryModel } from '../../models/category.model';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-edit-category',
@@ -30,7 +31,8 @@ export class EditCategoryComponent implements OnInit {
   constructor(
     private _categoryService: CategoryService,
     private _router: Router,
-    private _activatedRoute: ActivatedRoute
+    private _activatedRoute: ActivatedRoute,
+    private _snackbar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -52,7 +54,9 @@ export class EditCategoryComponent implements OnInit {
         })
       )
       .subscribe(() => {
-        this._loadingSubject.next(false);
+        this._snackbar.open('Category updated', undefined, {
+          duration: 3000,
+        });
         this._router.navigateByUrl('');
       });
   }

@@ -21,6 +21,7 @@ import { TeamMemberService } from '../../services/team-member.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { FileService } from '../../services/file.service';
 import { UploadcareFile } from '@uploadcare/upload-client';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-edit-task',
@@ -83,7 +84,8 @@ export class EditTaskComponent {
     private _teamMemberService: TeamMemberService,
     private _categoryService: CategoryService,
     private _fileService: FileService,
-    private _sanitize: DomSanitizer
+    private _sanitize: DomSanitizer,
+    private _snackbar: MatSnackBar
   ) {}
 
   onFileChanged(event: any): void {
@@ -133,6 +135,9 @@ export class EditTaskComponent {
         })
       )
       .subscribe(() => {
+        this._snackbar.open('Task updated', undefined, {
+          duration: 3000,
+        });
         this._router.navigateByUrl(`categories/${form.value.categoryId}`);
       });
   }

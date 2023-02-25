@@ -20,6 +20,7 @@ import { TeamMemberService } from '../../services/team-member.service';
 import { FileService } from '../../services/file.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import { UploadcareFile } from '@uploadcare/upload-client';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-create-task',
@@ -85,7 +86,8 @@ export class CreateTaskComponent {
     private _activatedRoute: ActivatedRoute,
     private _teamMemberService: TeamMemberService,
     private _fileService: FileService,
-    private _sanitize: DomSanitizer
+    private _sanitize: DomSanitizer,
+    private _snackbar: MatSnackBar
   ) {}
 
   onFileChanged(event: any): void {
@@ -132,6 +134,9 @@ export class CreateTaskComponent {
         })
       )
       .subscribe(() => {
+        this._snackbar.open('Task added', undefined, {
+          duration: 3000,
+        });
         this._router.navigateByUrl(`/categories/${form.value.categoryId}`);
       });
     return;
