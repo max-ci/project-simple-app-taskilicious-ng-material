@@ -42,8 +42,14 @@ export class TaskFormComponent {
     imageUrl: new FormControl(''),
   });
 
-  private _loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
-  public loading$: Observable<boolean> = this._loadingSubject.asObservable();
+  private _loadingCreateOrUpdateSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(
+    false
+  );
+  public loadingCreateOrUpdate$: Observable<boolean> =
+    this._loadingCreateOrUpdateSubject.asObservable();
+
+  private _loadingTaskSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public loadingTask$: Observable<boolean> = this._loadingTaskSubject.asObservable();
 
   private _uploadProgressSubject: Subject<number> = new Subject<number>();
   public uploadProgress$: Observable<number> = this._uploadProgressSubject.asObservable();
@@ -67,6 +73,7 @@ export class TaskFormComponent {
     filter((params: Params) => params['id']),
     take(1),
     tap(() => {
+      this._loadingTaskSubject.next(true);
       this._headingTextSubject.next('Edit task');
       this._submitButtonText.next('Update');
     })
@@ -174,6 +181,7 @@ export class TaskFormComponent {
             );
           });
 
+          this._loadingTaskSubject.next(false);
           this._teamMembersSubject$.next(teamMembers);
         })
       )
@@ -207,7 +215,7 @@ export class TaskFormComponent {
     if (!form.valid) {
       return;
     }
-    this._loadingSubject.next(true);
+    this._loadingCreateOrUpdateSubject.next(true);
 
     const teamMemberIds: string[] = this._getAssignedTeamMembersToTask(form.value.teamMemberIds);
 
@@ -237,7 +245,7 @@ export class TaskFormComponent {
         take(1),
         catchError(() => {
           this._showMessage('An error occurred');
-          this._loadingSubject.next(false);
+          this._loadingCreateOrUpdateSubject.next(false);
           this._uploadProgressSubject.next(0);
           return EMPTY;
         })
@@ -275,7 +283,7 @@ export class TaskFormComponent {
         take(1),
         catchError(() => {
           this._showMessage('An error occurred');
-          this._loadingSubject.next(false);
+          this._loadingCreateOrUpdateSubject.next(false);
           this._uploadProgressSubject.next(0);
           return EMPTY;
         })

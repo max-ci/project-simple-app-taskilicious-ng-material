@@ -11,10 +11,17 @@
     <div class="mb-1">
       <mat-form-field appearance="outline">
         <mat-label>Name</mat-label
-        ><input matInput type="text" placeholder="Name" formControlName="name" required /><mat-error
-          *ngIf="form.get('name')!.invalid"
-          >Name is required</mat-error
-        ></mat-form-field
+        ><input matInput type="text" placeholder="Name" formControlName="name" required />
+        <div class="loader-inside-input">
+          <mat-progress-spinner
+            *ngIf="loadingTask$ | async"
+            [color]="'primary'"
+            [mode]="'indeterminate'"
+            [value]="50"
+            [diameter]="24">
+          </mat-progress-spinner>
+        </div>
+        <mat-error *ngIf="form.get('name')!.invalid">Name is required</mat-error></mat-form-field
       >
     </div>
 
@@ -24,8 +31,18 @@
         <mat-select formControlName="categoryId" required>
           <mat-option *ngFor="let category of categories$ | async" [value]="category.id">
             {{ category.name }}
-          </mat-option> </mat-select
-        ><mat-error *ngIf="form.get('categoryId')!.invalid">Category is required</mat-error>
+          </mat-option>
+        </mat-select>
+        <div class="loader-inside-input loader-inside-input-select">
+          <mat-progress-spinner
+            *ngIf="loadingTask$ | async"
+            [color]="'primary'"
+            [mode]="'indeterminate'"
+            [value]="50"
+            [diameter]="24">
+          </mat-progress-spinner>
+        </div>
+        <mat-error *ngIf="form.get('categoryId')!.invalid">Category is required</mat-error>
       </mat-form-field>
     </div>
 
@@ -81,13 +98,17 @@
     </div>
 
     <div class="mb-1" *ngIf="submitButtonText$ | async as submitButtonText">
-      <button type="submit" mat-raised-button color="primary" [disabled]="loading$ | async">
+      <button
+        type="submit"
+        mat-raised-button
+        color="primary"
+        [disabled]="loadingCreateOrUpdate$ | async">
         {{ submitButtonText }}
       </button>
     </div>
 
     <mat-progress-spinner
-      *ngIf="loading$ | async"
+      *ngIf="loadingCreateOrUpdate$ | async"
       [color]="'primary'"
       [mode]="'indeterminate'"
       [value]="50"
