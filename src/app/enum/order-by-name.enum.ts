@@ -1,4 +1,4 @@
-export enum OrderByName {
+export enum OrderByNameEnum {
   Asc = 'A-Z',
   Desc = 'Z-A',
 }
