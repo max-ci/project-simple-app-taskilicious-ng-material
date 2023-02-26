@@ -10,6 +10,8 @@ import {
   take,
   takeUntil,
   catchError,
+  of,
+  EMPTY,
 } from 'rxjs';
 import { CategoryModel } from '../../models/category.model';
 import { TaskModel } from '../../models/task.model';
@@ -55,10 +57,13 @@ export class CategoryDetailComponent implements OnDestroy {
                 return task.teamMemberIds.includes(teamMember.id);
               })
             : [];
-
           return { ...task, teamMembers: teamMembersAssignedToTask };
         })
-    )
+    ),
+    catchError(() => {
+      this._showMessage('An error occurred');
+      return of([]);
+    })
   );
 
   private _refreshTaskSubject: BehaviorSubject<void> = new BehaviorSubject<void>(void 0);
@@ -88,17 +93,16 @@ export class CategoryDetailComponent implements OnDestroy {
       .delete(id)
       .pipe(
         take(1),
-        catchError((err) => {
+        catchError(() => {
           this._loadingDeleteTask.next(null);
-          throw err;
+          this._showMessage('An error occurred');
+          return EMPTY;
         })
       )
       .subscribe(() => {
         this._loadingDeleteTask.next(null);
         this._refreshTaskSubject.next();
-        this._snackbar.open('Task deleted', undefined, {
-          duration: 3000,
-        });
+        this._showMessage('Task deleted');
       });
   }
 
@@ -117,5 +121,11 @@ export class CategoryDetailComponent implements OnDestroy {
 
   taskTrackBy(index: number, task: TaskModel): string {
     return task.id;
+  }
+
+  private _showMessage(message: string): void {
+    this._snackbar.open(message, undefined, {
+      duration: 3000,
+    });
   }
 }

@@ -92,10 +92,10 @@ export class CategoryFormComponent {
       .pipe(
         switchMap(() => this._categoryService.create(form.value)),
         take(1),
-        catchError((err) => {
+        catchError(() => {
           this._loadingSubject.next(false);
           this._showMessage('An error occurred');
-          throw err;
+          return EMPTY;
         })
       )
       .subscribe(() => {
@@ -109,10 +109,10 @@ export class CategoryFormComponent {
       .pipe(
         switchMap((params: Params) => this._categoryService.update(params['id'], form.value)),
         take(1),
-        catchError((err) => {
+        catchError(() => {
           this._loadingSubject.next(false);
           this._showMessage('An error occurred');
-          throw err;
+          return EMPTY;
         })
       )
       .subscribe(() => {
