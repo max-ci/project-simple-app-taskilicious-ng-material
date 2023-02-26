@@ -29,6 +29,9 @@ export class CategoryFormComponent {
   private _loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this._loadingSubject.asObservable();
 
+  private _loadingCategorySubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
+  public loadingCategory$: Observable<boolean> = this._loadingCategorySubject.asObservable();
+
   private _headingTextSubject: BehaviorSubject<string> = new BehaviorSubject<string>('');
   public headingText$: Observable<string> = this._headingTextSubject.asObservable();
 
@@ -48,6 +51,7 @@ export class CategoryFormComponent {
     filter((params: Params) => params['id']),
     take(1),
     tap(() => {
+      this._loadingCategorySubject.next(true);
       this._headingTextSubject.next('Edit category');
       this._submitButtonText.next('Submit');
     })
@@ -64,6 +68,7 @@ export class CategoryFormComponent {
       }),
       tap((data: CategoryModel) => {
         this.form.patchValue(data);
+        this._loadingCategorySubject.next(false);
         this._loadingSubject.next(false);
       })
     )
@@ -107,6 +112,9 @@ export class CategoryFormComponent {
   private _onFormSubmittedUpdateRoute(form: FormGroup): void {
     this._updateRoute$
       .pipe(
+        tap(() => {
+          this._loadingCategorySubject.next(false);
+        }),
         switchMap((params: Params) => this._categoryService.update(params['id'], form.value)),
         take(1),
         catchError(() => {
