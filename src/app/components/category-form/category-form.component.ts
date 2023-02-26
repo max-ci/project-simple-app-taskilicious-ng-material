@@ -36,7 +36,7 @@ export class CategoryFormComponent {
   public submitButtonText$: Observable<string> = this._submitButtonText.asObservable();
 
   private readonly _createRoute$: Observable<Params> = this._activatedRoute.params.pipe(
-    filter((params) => !params['id']),
+    filter((params: Params) => !params['id']),
     take(1),
     tap(() => {
       this._headingTextSubject.next('Create category');
@@ -45,7 +45,7 @@ export class CategoryFormComponent {
   );
 
   private readonly _updateRoute$: Observable<Params> = this._activatedRoute.params.pipe(
-    filter((params) => params['id']),
+    filter((params: Params) => params['id']),
     take(1),
     tap(() => {
       this._headingTextSubject.next('Edit category');
