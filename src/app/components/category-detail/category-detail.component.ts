@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, ViewEncapsulation } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnDestroy,
+  TemplateRef,
+  ViewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
   BehaviorSubject,
@@ -12,6 +19,8 @@ import {
   catchError,
   of,
   EMPTY,
+  filter,
+  tap,
 } from 'rxjs';
 import { CategoryModel } from '../../models/category.model';
 import { TaskModel } from '../../models/task.model';
@@ -21,6 +30,7 @@ import { TeamMemberService } from '../../services/team-member.service';
 import { TeamMemberModel } from '../../models/team-member.model';
 import { TaskWithTeamMembersModel } from '../../models/task-with-team-members.model';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Dialog, DialogRef } from '@angular/cdk/dialog';
 
 @Component({
   selector: 'app-category-detail',
@@ -30,6 +40,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoryDetailComponent implements OnDestroy {
+  @ViewChild('deleteDialogTemplate') deleteDialogTemplate!: TemplateRef<any>;
+
   private _destroySubject: Subject<void> = new Subject<void>();
 
   private _loadingDeleteTask: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(
@@ -85,7 +97,9 @@ export class CategoryDetailComponent implements OnDestroy {
     private _taskService: TaskService,
     private _teamMemberService: TeamMemberService,
     private _router: Router,
-    private _snackbar: MatSnackBar
+    private _snackbar: MatSnackBar,
+    private _dialog: Dialog,
+    public dialogRef: DialogRef<boolean>
   ) {}
 
   ngOnDestroy(): void {
@@ -93,11 +107,20 @@ export class CategoryDetailComponent implements OnDestroy {
     this._destroySubject.complete();
   }
 
-  deleteTask(id: string): void {
-    this._loadingDeleteTask.next(id);
-    this._taskService
-      .delete(id)
+  deleteTask(id: string, name: string): void {
+    this.dialogRef = this._dialog.open(this.deleteDialogTemplate, {
+      data: {
+        taskName: name,
+      },
+    });
+
+    this.dialogRef.closed
       .pipe(
+        filter((result: boolean | undefined) => (typeof result === 'undefined' ? false : result)),
+        tap(() => {
+          this._loadingDeleteTask.next(id);
+        }),
+        switchMap(() => this._taskService.delete(id).pipe()),
         take(1),
         catchError(() => {
           this._loadingDeleteTask.next(null);

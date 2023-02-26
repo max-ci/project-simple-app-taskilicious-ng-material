@@ -9,6 +9,8 @@ import { RouterLink } from '@angular/router';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
 import { GoBackDirectiveModule } from '../../directives/go-back.module';
+import { DialogRef } from '@angular/cdk/dialog';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
   imports: [
@@ -22,9 +24,10 @@ import { GoBackDirectiveModule } from '../../directives/go-back.module';
     MatSnackBarModule,
     MatCardModule,
     GoBackDirectiveModule,
+    MatDialogModule,
   ],
   declarations: [CategoryDetailComponent],
-  providers: [],
+  providers: [{ provide: DialogRef, useValue: {} }],
   exports: [CategoryDetailComponent],
 })
 export class CategoryDetailComponentModule {}

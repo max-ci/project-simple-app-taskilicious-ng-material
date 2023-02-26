@@ -58,3 +58,19 @@ body {
 .loader-inside-input-select {
   right: 20px;
 }
+
+.dialog-content {
+  display: block;
+  background: #fff;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+}
+
+.dialog-content-message {
+  margin-top: 0;
+}
+
+.dialog-buttons {
+  display: flex;
+  justify-content: space-between;
+}

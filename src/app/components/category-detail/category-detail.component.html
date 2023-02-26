@@ -84,7 +84,7 @@
         <th mat-header-cell *matHeaderCellDef>Remove</th>
         <td mat-cell *matCellDef="let task">
           <ng-container *ngIf="(loadingDeleteTask$ | async) !== task.id; else loadingDeleteTask">
-            <button (click)="deleteTask(task.id)" mat-mini-fab color="warn">
+            <button (click)="deleteTask(task.id, task.name)" mat-mini-fab color="warn">
               <mat-icon>remove</mat-icon>
             </button>
           </ng-container>
@@ -125,3 +125,26 @@
     <mat-icon>add</mat-icon>
   </button>
 </mat-card>
+
+<ng-template #deleteDialogTemplate let-data>
+  <div class="dialog-content">
+    <p class="dialog-content-message">
+      Are you sure you want to delete <strong>{{ data.taskName }}</strong> task?
+    </p>
+
+    <div class="dialog-buttons">
+      <button
+        mat-raised-button
+        color="primary"
+        type="button"
+        class="btn btn-secondary"
+        (click)="dialogRef.close(false)">
+        Cancel
+      </button>
+
+      <button type="button" mat-raised-button color="warn" (click)="dialogRef.close(true)">
+        Delete
+      </button>
+    </div>
+  </div>
+</ng-template>
