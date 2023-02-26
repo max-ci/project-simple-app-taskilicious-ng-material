@@ -39,7 +39,12 @@ export class CategoryDetailComponent implements OnDestroy {
 
   readonly category$: Observable<CategoryModel> = this._activatedRoute.params.pipe(
     switchMap((params: Params) => this._categoryService.getOne(params['id'])),
-    take(1)
+    take(1),
+    catchError(() => {
+      this._showMessage(`Category doesn't exist or an error occurred`);
+      this._router.navigateByUrl('');
+      return EMPTY;
+    })
   );
 
   private readonly _tasks$: Observable<TaskWithTeamMembersModel[]> = combineLatest([
