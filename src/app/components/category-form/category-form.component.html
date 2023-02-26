@@ -1,3 +1,7 @@
+<div class="mb-1">
+  <button appGoBack mat-raised-button color="primary">Back</button>
+</div>
+
 <mat-card>
   <div class="mb-1" *ngIf="headingText$ | async as headingText">
     <mat-card-title>{{ headingText }}</mat-card-title>

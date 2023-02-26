@@ -8,6 +8,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CategoryFormComponent } from './category-form.component';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { GoBackDirectiveModule } from '../../directives/go-back.module';
 
 @NgModule({
   imports: [
@@ -19,6 +20,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatProgressSpinnerModule,
     MatCardModule,
     MatSnackBarModule,
+    GoBackDirectiveModule,
   ],
   declarations: [CategoryFormComponent],
   providers: [],

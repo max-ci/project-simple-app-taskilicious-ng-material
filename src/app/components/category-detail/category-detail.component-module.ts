@@ -8,6 +8,7 @@ import { CategoryDetailComponent } from './category-detail.component';
 import { RouterLink } from '@angular/router';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
+import { GoBackDirectiveModule } from '../../directives/go-back.module';
 
 @NgModule({
   imports: [
@@ -20,6 +21,7 @@ import { MatCardModule } from '@angular/material/card';
     MatIconModule,
     MatSnackBarModule,
     MatCardModule,
+    GoBackDirectiveModule,
   ],
   declarations: [CategoryDetailComponent],
   providers: [],

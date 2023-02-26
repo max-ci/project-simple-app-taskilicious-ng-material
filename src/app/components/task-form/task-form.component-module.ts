@@ -12,6 +12,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { GoBackDirectiveModule } from '../../directives/go-back.module';
 
 @NgModule({
   imports: [
@@ -27,6 +28,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     MatSnackBarModule,
     MatIconModule,
     MatProgressBarModule,
+    GoBackDirectiveModule,
   ],
   declarations: [TaskFormComponent],
   providers: [],
