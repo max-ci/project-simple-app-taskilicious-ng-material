@@ -10,6 +10,7 @@ import {
   switchMap,
   take,
   tap,
+  EMPTY,
 } from 'rxjs';
 import { CategoryModel } from '../../models/category.model';
 import { CategoryService } from '../../services/category.service';
@@ -56,6 +57,11 @@ export class CategoryFormComponent {
     .pipe(
       switchMap((params: Params) => this._categoryService.getOne(params['id'])),
       take(1),
+      catchError(() => {
+        this._showMessage(`Category doesn't exist or an error occurred`);
+        this._router.navigateByUrl('');
+        return EMPTY;
+      }),
       tap((data: CategoryModel) => {
         this.form.patchValue(data);
         this._loadingSubject.next(false);
@@ -77,45 +83,45 @@ export class CategoryFormComponent {
       return;
     }
     this._loadingSubject.next(true);
-    this.onFormSubmittedCreateRoute(form);
-    this.onFormSubmittedUpdateRoute(form);
+    this._onFormSubmittedCreateRoute(form);
+    this._onFormSubmittedUpdateRoute(form);
   }
 
-  onFormSubmittedCreateRoute(form: FormGroup): void {
+  private _onFormSubmittedCreateRoute(form: FormGroup): void {
     this._createRoute$
       .pipe(
         switchMap(() => this._categoryService.create(form.value)),
         take(1),
         catchError((err) => {
           this._loadingSubject.next(false);
-          this.showMessage('An error occurred');
+          this._showMessage('An error occurred');
           throw err;
         })
       )
       .subscribe(() => {
-        this.showMessage('Category added');
+        this._showMessage('Category added');
         this._router.navigateByUrl('');
       });
   }
 
-  onFormSubmittedUpdateRoute(form: FormGroup): void {
+  private _onFormSubmittedUpdateRoute(form: FormGroup): void {
     this._updateRoute$
       .pipe(
         switchMap((params: Params) => this._categoryService.update(params['id'], form.value)),
         take(1),
         catchError((err) => {
           this._loadingSubject.next(false);
-          this.showMessage('An error occurred');
+          this._showMessage('An error occurred');
           throw err;
         })
       )
       .subscribe(() => {
-        this.showMessage('Category updated');
+        this._showMessage('Category updated');
         this._router.navigateByUrl('');
       });
   }
 
-  showMessage(message: string): void {
+  private _showMessage(message: string): void {
     this._snackbar.open(message, undefined, {
       duration: 3000,
     });
