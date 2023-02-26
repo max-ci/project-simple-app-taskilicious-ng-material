@@ -53,8 +53,9 @@ export class CategoryDetailComponent implements OnDestroy {
     this._teamMemberService.getAll(),
   ]).pipe(
     takeUntil(this._destroySubject),
-    map(([params, tasks, teamMembers]: [Params, TaskModel[], TeamMemberModel[]]) =>
-      tasks
+    map(([params, tasks, teamMembers]: [Params, TaskModel[], TeamMemberModel[]]) => {
+      this._loadingDeleteTask.next(null);
+      return tasks
         .filter((task: TaskModel) => task.categoryId === params['id'])
         .map((task: TaskModel) => {
           const teamMembersAssignedToTask: TeamMemberModel[] = Array.isArray(task?.teamMemberIds)
@@ -63,8 +64,8 @@ export class CategoryDetailComponent implements OnDestroy {
               })
             : [];
           return { ...task, teamMembers: teamMembersAssignedToTask };
-        })
-    ),
+        });
+    }),
     catchError(() => {
       this._showMessage('An error occurred');
       return of([]);
@@ -105,7 +106,6 @@ export class CategoryDetailComponent implements OnDestroy {
         })
       )
       .subscribe(() => {
-        this._loadingDeleteTask.next(null);
         this._refreshTaskSubject.next();
         this._showMessage('Task deleted');
       });
