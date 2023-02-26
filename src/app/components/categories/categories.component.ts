@@ -41,9 +41,7 @@ export class CategoriesComponent implements OnDestroy {
       )
     ),
     catchError(() => {
-      this._snackbar.open('An error occurred', undefined, {
-        duration: 3000,
-      });
+      this._showMessage('An error occurred');
       return of([]);
     })
   );
@@ -57,5 +55,11 @@ export class CategoriesComponent implements OnDestroy {
 
   onOrderByNameSelectionChanged(event: MatSelectChange): void {
     this._orderByNameSubject.next(event.value);
+  }
+
+  private _showMessage(message: string): void {
+    this._snackbar.open(message, undefined, {
+      duration: 3000,
+    });
   }
 }
