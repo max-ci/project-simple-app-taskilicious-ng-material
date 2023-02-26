@@ -1,5 +1,7 @@
 <mat-card>
-  <div class="mb-1"><mat-card-title>Create category</mat-card-title></div>
+  <div class="mb-1" *ngIf="headingText$ | async as headingText">
+    <mat-card-title>{{ headingText }}</mat-card-title>
+  </div>
 
   <form [formGroup]="form" (ngSubmit)="onFormSubmitted(form)" class="mb-1">
     <div class="mb-1">
@@ -12,9 +14,9 @@
       >
     </div>
 
-    <div>
+    <div *ngIf="submitButtonText$ | async as submitButtonText">
       <button type="submit" mat-raised-button color="primary" [disabled]="loading$ | async">
-        Create
+        {{ submitButtonText }}
       </button>
     </div>
   </form>
