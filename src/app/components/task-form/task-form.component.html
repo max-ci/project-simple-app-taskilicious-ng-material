@@ -1,10 +1,12 @@
 <mat-card>
-  <div class="mb-1"><mat-card-title>Edit task</mat-card-title></div>
+  <div class="mb-1" *ngIf="headingText$ | async as headingText">
+    <mat-card-title>{{ headingText }}</mat-card-title>
+  </div>
 
   <form [formGroup]="form" (ngSubmit)="onFormSubmitted(form)">
     <div class="mb-1">
-      <mat-form-field appearance="outline"
-        ><mat-label>Name</mat-label
+      <mat-form-field appearance="outline">
+        <mat-label>Name</mat-label
         ><input matInput type="text" placeholder="Name" formControlName="name" required /><mat-error
           *ngIf="form.get('name')!.invalid"
           >Name is required</mat-error
@@ -23,13 +25,16 @@
       </mat-form-field>
     </div>
 
-    <div formArrayName="teamMemberIds" *ngIf="teamMembers$ | async; else loadingTeamMembers">
-      <div *ngFor="let teamMember of teamMembers$ | async; index as i" [formGroupName]="i">
+    <div
+      formArrayName="teamMemberIds"
+      class="mb-1"
+      *ngIf="teamMembers$ | async as teamMembers; else loadingTeamMembers">
+      <div *ngFor="let teamMember of teamMembers; index as i" [formGroupName]="i">
         <mat-checkbox [formControlName]="teamMember.id" class="mb-1"
-          ><div class="edit-task-checkbox-content">
+          ><div class="create-task-checkbox-content">
             <img
               src="{{ teamMember.avatar }}"
-              class="edit-task-checkbox-avatar"
+              class="create-task-checkbox-avatar"
               [alt]="teamMember.name" />
             {{ teamMember.name }}
           </div></mat-checkbox
@@ -49,23 +54,19 @@
 
     <div class="mb-1">
       <ng-container *ngIf="imageToUploadPreview$ | async as imageUrl"
-        ><img [src]="imageUrl" class="edit-task-image mb-1"
+        ><img [src]="imageUrl" class="create-task-image mb-1"
       /></ng-container>
       <input type="file" accept="image/*" (change)="onFileChanged($event)" />
     </div>
 
-    <div class="mb-1">
-      <button
-        type="submit"
-        mat-raised-button
-        color="primary"
-        [disabled]="loadingUpdateTask$ | async">
-        Update
+    <div class="mb-1" *ngIf="submitButtonText$ | async as submitButtonText">
+      <button type="submit" mat-raised-button color="primary" [disabled]="loading$ | async">
+        {{ submitButtonText }}
       </button>
     </div>
 
     <mat-progress-spinner
-      *ngIf="loadingUpdateTask$ | async"
+      *ngIf="loading$ | async"
       [color]="'primary'"
       [mode]="'indeterminate'"
       [value]="50"

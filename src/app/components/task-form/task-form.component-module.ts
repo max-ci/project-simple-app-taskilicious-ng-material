@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { EditTaskComponent } from './edit-task.component';
+import { TaskFormComponent } from './task-form.component';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -24,8 +24,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     MatCardModule,
     MatSnackBarModule,
   ],
-  declarations: [EditTaskComponent],
+  declarations: [TaskFormComponent],
   providers: [],
-  exports: [EditTaskComponent],
+  exports: [TaskFormComponent],
 })
-export class EditTaskComponentModule {}
+export class TaskFormComponentModule {}
