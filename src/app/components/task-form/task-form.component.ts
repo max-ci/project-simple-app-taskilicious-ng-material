@@ -194,6 +194,12 @@ export class TaskFormComponent {
     fileReader.readAsDataURL(file);
   }
 
+  deleteImageFromTask(): void {
+    this._imageToUploadPreview.next('');
+    this._imageToUpload.next(null);
+    this.form.patchValue({ imageUrl: '' });
+  }
+
   onFormSubmitted(form: FormGroup): void {
     if (!form.valid) {
       return;

@@ -52,10 +52,20 @@
       </mat-progress-spinner>
     </ng-template>
 
-    <div class="task-form-image-wrapper mb-1">
-      <ng-container *ngIf="imageToUploadPreview$ | async as imageUrl"
-        ><img [src]="imageUrl" class="task-form-image mb-1"
-      /></ng-container>
+    <div class="mb-1">
+      <ng-container *ngIf="imageToUploadPreview$ | async as imageUrl">
+        <div class="task-form-image-wrapper">
+          <img [src]="imageUrl" class="task-form-image mb-1" />
+          <button
+            type="button"
+            mat-mini-fab
+            class="task-form-image-delete"
+            color="warn"
+            (click)="deleteImageFromTask()">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </ng-container>
       <input type="file" accept="image/*" (change)="onFileChanged($event)" />
     </div>
 

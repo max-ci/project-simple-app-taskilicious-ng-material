@@ -1,8 +1,18 @@
 .task-form {
+  &-image-wrapper {
+    position: relative;
+  }
+
   &-image {
     display: block;
     width: 200px;
     height: auto;
+  }
+
+  &-image-delete {
+    position: absolute;
+    left: 5px;
+    top: 5px;
   }
 
   &-checkbox {
