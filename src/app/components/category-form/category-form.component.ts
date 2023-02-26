@@ -88,7 +88,7 @@ export class CategoryFormComponent {
         take(1),
         catchError((err) => {
           this._loadingSubject.next(false);
-          this.showMessage('An error occured');
+          this.showMessage('An error occurred');
           throw err;
         })
       )
@@ -105,7 +105,7 @@ export class CategoryFormComponent {
         take(1),
         catchError((err) => {
           this._loadingSubject.next(false);
-          this.showMessage('An error occured');
+          this.showMessage('An error occurred');
           throw err;
         })
       )
