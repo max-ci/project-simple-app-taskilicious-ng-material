@@ -31,10 +31,10 @@
       *ngIf="teamMembers$ | async as teamMembers; else loadingTeamMembers">
       <div *ngFor="let teamMember of teamMembers; index as i" [formGroupName]="i">
         <mat-checkbox [formControlName]="teamMember.id" class="mb-1"
-          ><div class="create-task-checkbox-content">
+          ><div class="task-form-checkbox-content">
             <img
               src="{{ teamMember.avatar }}"
-              class="create-task-checkbox-avatar"
+              class="task-form-checkbox-avatar"
               [alt]="teamMember.name" />
             {{ teamMember.name }}
           </div></mat-checkbox
@@ -52,9 +52,9 @@
       </mat-progress-spinner>
     </ng-template>
 
-    <div class="mb-1">
+    <div class="task-form-image-wrapper mb-1">
       <ng-container *ngIf="imageToUploadPreview$ | async as imageUrl"
-        ><img [src]="imageUrl" class="create-task-image mb-1"
+        ><img [src]="imageUrl" class="task-form-image mb-1"
       /></ng-container>
       <input type="file" accept="image/*" (change)="onFileChanged($event)" />
     </div>
