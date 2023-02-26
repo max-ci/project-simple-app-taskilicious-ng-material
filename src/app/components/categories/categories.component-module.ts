@@ -11,6 +11,7 @@ import { CategoriesComponent } from './categories.component';
 import { RouterModule } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCardModule } from '@angular/material/card';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   imports: [
@@ -25,6 +26,7 @@ import { MatCardModule } from '@angular/material/card';
     MatProgressSpinnerModule,
     MatCardModule,
     RouterModule,
+    MatSnackBarModule,
   ],
   declarations: [CategoriesComponent],
   providers: [],

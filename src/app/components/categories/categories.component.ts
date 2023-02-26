@@ -1,10 +1,11 @@
 import { ChangeDetectionStrategy, Component, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { BehaviorSubject, Observable, Subject, combineLatest, of, map } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, combineLatest, of, map, catchError } from 'rxjs';
 import { CategoryModel } from '../../models/category.model';
 import { CategoryService } from '../../services/category.service';
 import { OrderByNameEnum } from '../../enum/order-by-name.enum';
 import { MatSelectChange } from '@angular/material/select';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-categories',
@@ -38,10 +39,16 @@ export class CategoriesComponent implements OnDestroy {
           ? category2.name.localeCompare(category1.name)
           : category1.name.localeCompare(category2.name)
       )
-    )
+    ),
+    catchError(() => {
+      this._snackbar.open('An error occurred', undefined, {
+        duration: 3000,
+      });
+      return of([]);
+    })
   );
 
-  constructor(private _categoryService: CategoryService) {}
+  constructor(private _categoryService: CategoryService, private _snackbar: MatSnackBar) {}
 
   ngOnDestroy(): void {
     this._destroySubject.next();
