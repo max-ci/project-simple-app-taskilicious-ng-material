@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, from } from 'rxjs';
-import { UploadcareFile, UploadClient } from '@uploadcare/upload-client';
+import { ProgressCallback, UploadcareFile, UploadClient } from '@uploadcare/upload-client';
 import { environment } from '../../environments/environment';
 
 @Injectable()
@@ -9,7 +9,11 @@ export class FileService {
     publicKey: environment.uploadCareApiKey,
   });
 
-  upload(fileData: File): Observable<UploadcareFile> {
-    return from(this._uploadClient.uploadFile(fileData));
+  upload(fileData: File, onProgress: ProgressCallback): Observable<UploadcareFile> {
+    return from(
+      this._uploadClient.uploadFile(fileData, {
+        onProgress,
+      })
+    );
   }
 }

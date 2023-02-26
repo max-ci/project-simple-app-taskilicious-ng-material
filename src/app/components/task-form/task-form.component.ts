@@ -45,6 +45,9 @@ export class TaskFormComponent {
   private _loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
   public loading$: Observable<boolean> = this._loadingSubject.asObservable();
 
+  private _uploadProgressSubject: Subject<number> = new Subject<number>();
+  public uploadProgress$: Observable<number> = this._uploadProgressSubject.asObservable();
+
   private _headingTextSubject: BehaviorSubject<string> = new BehaviorSubject<string>('');
   public headingText$: Observable<string> = this._headingTextSubject.asObservable();
 
@@ -217,7 +220,11 @@ export class TaskFormComponent {
       .pipe(
         switchMap(() => this._imageToUpload),
         switchMap((imageToUpload: File | null) =>
-          imageToUpload ? this._fileService.upload(imageToUpload) : of(null)
+          imageToUpload
+            ? this._fileService.upload(imageToUpload, (progress) => {
+                progress?.isComputable && this._uploadProgressSubject.next(progress.value * 100);
+              })
+            : of(null)
         ),
         switchMap((image: UploadcareFile | null) =>
           this._taskService.create({
@@ -231,6 +238,7 @@ export class TaskFormComponent {
         catchError(() => {
           this._showMessage('An error occurred');
           this._loadingSubject.next(false);
+          this._uploadProgressSubject.next(0);
           return EMPTY;
         })
       )
@@ -247,7 +255,13 @@ export class TaskFormComponent {
         switchMap((imageToUpload: File | null) =>
           combineLatest([
             this._activatedRoute.params,
-            imageToUpload ? this._fileService.upload(imageToUpload) : of(null),
+            imageToUpload
+              ? this._fileService.upload(
+                  imageToUpload,
+                  (progress) =>
+                    progress?.isComputable && this._uploadProgressSubject.next(progress.value * 100)
+                )
+              : of(null),
           ])
         ),
         switchMap(([params, image]: [Params, UploadcareFile | null]) =>
@@ -262,6 +276,7 @@ export class TaskFormComponent {
         catchError(() => {
           this._showMessage('An error occurred');
           this._loadingSubject.next(false);
+          this._uploadProgressSubject.next(0);
           return EMPTY;
         })
       )

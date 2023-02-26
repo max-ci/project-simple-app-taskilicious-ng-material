@@ -11,6 +11,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatCardModule } from '@angular/material/card';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 
 @NgModule({
   imports: [
@@ -25,6 +26,7 @@ import { MatIconModule } from '@angular/material/icon';
     MatCardModule,
     MatSnackBarModule,
     MatIconModule,
+    MatProgressBarModule,
   ],
   declarations: [TaskFormComponent],
   providers: [],
