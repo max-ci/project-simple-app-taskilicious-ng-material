@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { CategoryDetailComponent } from './category-detail.component';
 import { RouterLink } from '@angular/router';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatCardModule } from '@angular/material/card';
 
 @NgModule({
   imports: [
@@ -18,6 +19,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     RouterLink,
     MatIconModule,
     MatSnackBarModule,
+    MatCardModule,
   ],
   declarations: [CategoryDetailComponent],
   providers: [],
