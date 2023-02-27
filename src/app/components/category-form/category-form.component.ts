@@ -98,14 +98,13 @@ export class CategoryFormComponent {
         switchMap(() => this._categoryService.create(form.value)),
         take(1),
         catchError(() => {
-          this._loadingSubject.next(false);
-          this._showMessage('An error occurred');
+          this._handleError('An error occurred');
           return EMPTY;
         })
       )
       .subscribe(() => {
         this._showMessage('Category added');
-        this._router.navigateByUrl('');
+        this._redirectToCategories();
       });
   }
 
@@ -118,15 +117,23 @@ export class CategoryFormComponent {
         switchMap((params: Params) => this._categoryService.update(params['id'], form.value)),
         take(1),
         catchError(() => {
-          this._loadingSubject.next(false);
-          this._showMessage('An error occurred');
+          this._handleError('An error occurred');
           return EMPTY;
         })
       )
       .subscribe(() => {
         this._showMessage('Category updated');
-        this._router.navigateByUrl('');
+        this._redirectToCategories();
       });
+  }
+
+  private _handleError(message: string): void {
+    this._loadingSubject.next(false);
+    this._showMessage(message);
+  }
+
+  private _redirectToCategories(): void {
+    this._router.navigateByUrl('');
   }
 
   private _showMessage(message: string): void {

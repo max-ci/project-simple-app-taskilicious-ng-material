@@ -146,14 +146,7 @@ export class TaskFormComponent {
               return EMPTY;
             }),
             tap((teamMembers: TeamMemberModel[]) => {
-              teamMembers.forEach((teamMember: TeamMemberModel) => {
-                this.teamMemberIdsFormArray.push(
-                  new FormGroup({
-                    [teamMember.id]: new FormControl(),
-                  })
-                );
-              });
-
+              this._setTeamMembersCheckBoxes(teamMembers, []);
               this._teamMembersSubject$.next(teamMembers);
             })
           )
@@ -179,17 +172,7 @@ export class TaskFormComponent {
           if (task.imageUrl) {
             this._imageToUploadPreview.next(this._sanitize.bypassSecurityTrustUrl(task.imageUrl));
           }
-
-          teamMembers.forEach((teamMember: TeamMemberModel) => {
-            const teamMemberToTask = task.teamMemberIds?.includes(teamMember.id) ? true : null;
-
-            this.teamMemberIdsFormArray.push(
-              new FormGroup({
-                [teamMember.id]: new FormControl(teamMemberToTask),
-              })
-            );
-          });
-
+          this._setTeamMembersCheckBoxes(teamMembers, task.teamMemberIds);
           this._loadingTaskSubject.next(false);
           this._teamMembersSubject$.next(teamMembers);
         })
@@ -254,15 +237,13 @@ export class TaskFormComponent {
         ),
         take(1),
         catchError(() => {
-          this._showMessage('An error occurred');
-          this._loadingCreateOrUpdateSubject.next(false);
-          this._uploadProgressSubject.next(0);
+          this._handleError('An error occurred');
           return EMPTY;
         })
       )
       .subscribe(() => {
         this._showMessage('Task added');
-        this._router.navigateByUrl(`/categories/${form.value.categoryId}`);
+        this._redirectToCategoryDetails(form.value.categoryId);
       });
   }
 
@@ -292,16 +273,25 @@ export class TaskFormComponent {
         ),
         take(1),
         catchError(() => {
-          this._showMessage('An error occurred');
-          this._loadingCreateOrUpdateSubject.next(false);
-          this._uploadProgressSubject.next(0);
+          this._handleError('An error occurred');
           return EMPTY;
         })
       )
       .subscribe(() => {
         this._showMessage('Task updated');
-        this._router.navigateByUrl(`categories/${form.value.categoryId}`);
+        this._redirectToCategoryDetails(form.value.categoryId);
       });
+  }
+
+  private _setTeamMembersCheckBoxes(teamMembers: TeamMemberModel[], teamMemberIds: string[]): void {
+    teamMembers.forEach((teamMember: TeamMemberModel) => {
+      const teamMemberToTask = teamMemberIds?.includes(teamMember.id) ? true : null;
+      this.teamMemberIdsFormArray.push(
+        new FormGroup({
+          [teamMember.id]: new FormControl(teamMemberToTask),
+        })
+      );
+    });
   }
 
   private _getAssignedTeamMembersToTask(teamMemberIds: { [key: string]: true | null }[]): string[] {
@@ -313,6 +303,16 @@ export class TaskFormComponent {
       }
       return acc;
     }, []);
+  }
+
+  private _handleError(message: string): void {
+    this._showMessage(message);
+    this._loadingCreateOrUpdateSubject.next(false);
+    this._uploadProgressSubject.next(0);
+  }
+
+  private _redirectToCategoryDetails(id: string): void {
+    this._router.navigateByUrl(`/categories/${id}`);
   }
 
   private _showMessage(message: string): void {
