@@ -169,7 +169,8 @@ export class TaskFormComponent {
           combineLatest([this._taskService.getOne(params['id']), this._teamMemberService.getAll()])
         ),
         catchError(() => {
-          this._showMessage('An error occurred');
+          this._showMessage(`Task doesn't exist or an error occurred`);
+          this._router.navigateByUrl('');
           return EMPTY;
         }),
         take(1),
