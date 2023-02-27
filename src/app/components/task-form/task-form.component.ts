@@ -1,4 +1,10 @@
-import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  ViewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
@@ -35,6 +41,8 @@ import { TaskModel } from '../../models/task.model';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TaskFormComponent {
+  @ViewChild('inputImage') inputImage!: ElementRef;
+
   readonly form: FormGroup = new FormGroup({
     name: new FormControl(),
     categoryId: new FormControl(),
@@ -209,6 +217,7 @@ export class TaskFormComponent {
     this._imageToUploadPreview.next('');
     this._imageToUpload.next(null);
     this.form.patchValue({ imageUrl: '' });
+    this.inputImage.nativeElement.value = '';
   }
 
   onFormSubmitted(form: FormGroup): void {

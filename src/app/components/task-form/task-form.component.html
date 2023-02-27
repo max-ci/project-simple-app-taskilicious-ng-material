@@ -94,7 +94,7 @@
             class="mb-1"></mat-progress-bar>
         </ng-container>
       </ng-container>
-      <input type="file" accept="image/*" (change)="onFileChanged($event)" />
+      <input type="file" accept="image/*" (change)="onFileChanged($event)" #inputImage />
     </div>
 
     <div class="mb-1" *ngIf="submitButtonText$ | async as submitButtonText">
