@@ -221,19 +221,10 @@ export class TaskFormComponent {
       .pipe(
         switchMap(() => this._imageToUpload),
         switchMap((imageToUpload: File | null) =>
-          imageToUpload
-            ? this._fileService.upload(imageToUpload, (progress) => {
-                progress?.isComputable && this._uploadProgressSubject.next(progress.value * 100);
-              })
-            : of(null)
+          imageToUpload ? this._uploadFile(imageToUpload) : of(null)
         ),
         switchMap((image: UploadcareFile | null) =>
-          this._taskService.create({
-            name: form.value.name,
-            categoryId: form.value.categoryId,
-            teamMemberIds: teamMemberIds,
-            imageUrl: image ? (image.cdnUrl as string) : form.value.imageUrl,
-          })
+          this._createOrUpdate(form, teamMemberIds, image)
         ),
         take(1),
         catchError(() => {
@@ -254,22 +245,11 @@ export class TaskFormComponent {
         switchMap((imageToUpload: File | null) =>
           combineLatest([
             this._activatedRoute.params,
-            imageToUpload
-              ? this._fileService.upload(
-                  imageToUpload,
-                  (progress) =>
-                    progress?.isComputable && this._uploadProgressSubject.next(progress.value * 100)
-                )
-              : of(null),
+            imageToUpload ? this._uploadFile(imageToUpload) : of(null),
           ])
         ),
         switchMap(([params, image]: [Params, UploadcareFile | null]) =>
-          this._taskService.update(params['id'], {
-            name: form.value.name,
-            categoryId: form.value.categoryId,
-            teamMemberIds: teamMemberIds,
-            imageUrl: image ? (image.cdnUrl as string) : form.value.imageUrl,
-          })
+          this._createOrUpdate(form, teamMemberIds, image, params['id'])
         ),
         take(1),
         catchError(() => {
@@ -281,6 +261,28 @@ export class TaskFormComponent {
         this._showMessage('Task updated');
         this._redirectToCategoryDetails(form.value.categoryId);
       });
+  }
+
+  private _uploadFile(imageToUpload: File): Observable<UploadcareFile | null> {
+    return this._fileService.upload(
+      imageToUpload,
+      (progress) => progress?.isComputable && this._uploadProgressSubject.next(progress.value * 100)
+    );
+  }
+
+  private _createOrUpdate(
+    form: FormGroup,
+    teamMemberIds: string[],
+    image: UploadcareFile | null,
+    id?: string
+  ): Observable<TaskModel> {
+    const task: Omit<TaskModel, 'id'> = {
+      name: form.value.name,
+      categoryId: form.value.categoryId,
+      teamMemberIds: teamMemberIds,
+      imageUrl: image ? (image.cdnUrl as string) : form.value.imageUrl,
+    };
+    return id ? this._taskService.update(id, task) : this._taskService.create(task);
   }
 
   private _setTeamMembersCheckBoxes(teamMembers: TeamMemberModel[], teamMemberIds: string[]): void {
