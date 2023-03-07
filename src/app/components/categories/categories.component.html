@@ -1,0 +1,29 @@
+<h1>Welcome to Taskilicious</h1>
+<h2>Choose a category</h2>
+
+<mat-form-field appearance="fill">
+  <mat-label>Order by name</mat-label>
+  <mat-select [formControl]="orderByNameSelect">
+    <mat-option *ngFor="let item of ordersByName | async" [value]="item">
+      {{ item }}
+    </mat-option>
+  </mat-select>
+</mat-form-field>
+
+<ng-container *ngIf="loading$ | async">
+  <mat-progress-spinner [color]="'primary'" [mode]="'indeterminate'" [value]="50" [diameter]="50">
+  </mat-progress-spinner>
+</ng-container>
+
+<ng-container *ngIf="categories$ | async as categories">
+  <mat-list role="list" *ngIf="categories.length; else empty"
+    ><mat-list-item role="listitem" *ngFor="let item of categories"
+      ><span routerLink="/categories/{{ item.id }}">{{ item.name }}</span>
+      <mat-icon routerLink="/categories/edit/{{ item.id }}">edit</mat-icon>
+    </mat-list-item></mat-list
+  >
+</ng-container>
+
+<ng-template #empty> <div>0 categories</div> </ng-template>
+
+<button mat-mini-fab routerLink="/categories/create"><mat-icon>add</mat-icon></button>
