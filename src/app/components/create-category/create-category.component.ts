@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { catchError, take } from 'rxjs/operators';
+import { BehaviorSubject, Observable, catchError, take } from 'rxjs';
 import { Router } from '@angular/router';
 import { CategoryService } from '../../services/category.service';
 

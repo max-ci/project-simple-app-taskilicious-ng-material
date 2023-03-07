@@ -3,7 +3,9 @@
 
 <mat-form-field appearance="fill">
   <mat-label>Order by name</mat-label>
-  <mat-select [formControl]="orderByNameSelect">
+  <mat-select
+    [formControl]="orderByNameSelect"
+    (selectionChange)="onOrderByNameSelectionChanged($event)">
     <mat-option *ngFor="let item of ordersByName | async" [value]="item">
       {{ item }}
     </mat-option>

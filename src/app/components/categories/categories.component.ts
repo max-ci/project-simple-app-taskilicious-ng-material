@@ -1,9 +1,10 @@
-import { ChangeDetectionStrategy, Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { BehaviorSubject, Observable, Subject, combineLatest, of, tap, map, takeUntil } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, combineLatest, of, tap, map } from 'rxjs';
 import { CategoryModel } from '../../models/category.model';
 import { CategoryService } from '../../services/category.service';
 import { OrderByName } from '../../enum/order-by-name.enum';
+import { MatSelectChange } from '@angular/material/select';
 
 @Component({
   selector: 'app-categories',
@@ -12,7 +13,7 @@ import { OrderByName } from '../../enum/order-by-name.enum';
   encapsulation: ViewEncapsulation.Emulated,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CategoriesComponent implements OnInit {
+export class CategoriesComponent {
   private _destroySubject: Subject<void> = new Subject<void>();
 
   private _loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
@@ -45,14 +46,12 @@ export class CategoriesComponent implements OnInit {
 
   constructor(private _categoryService: CategoryService) {}
 
-  ngOnInit(): void {
-    this.orderByNameSelect.valueChanges
-      .pipe(takeUntil(this._destroySubject))
-      .subscribe((value: OrderByName | null) => this._orderByNameSubject.next(value));
-  }
-
   ngOnDestroy(): void {
     this._destroySubject.next();
     this._destroySubject.complete();
+  }
+
+  onOrderByNameSelectionChanged(event: MatSelectChange): void {
+    this._orderByNameSubject.next(event.value);
   }
 }

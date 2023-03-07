@@ -1,0 +1,31 @@
+<form [formGroup]="form" (ngSubmit)="onFormSubmitted(form)">
+  <div>
+    <mat-form-field appearance="fill"
+      ><mat-label>Name</mat-label
+      ><input matInput type="text" placeholder="Name" formControlName="name" required /><mat-error
+        *ngIf="form.get('name')!.invalid"
+        >name is invalid</mat-error
+      ></mat-form-field
+    >
+  </div>
+  <div>
+    <mat-form-field appearance="fill">
+      <mat-label>Choose a category</mat-label>
+      <mat-select formControlName="categoryId" required>
+        <mat-option *ngFor="let category of categories$ | async" [value]="category.id">
+          {{ category.name }}
+        </mat-option> </mat-select
+      ><mat-error *ngIf="form.get('categoryId')!.invalid">categoryId is invalid</mat-error>
+    </mat-form-field>
+  </div>
+  <div>
+    <button type="submit" mat-raised-button color="primary" [disabled]="form.invalid">
+      Update
+    </button>
+  </div>
+</form>
+
+<ng-container *ngIf="loading$ | async">
+  <mat-progress-spinner [color]="'primary'" [mode]="'indeterminate'" [value]="50" [diameter]="50">
+  </mat-progress-spinner>
+</ng-container>
