@@ -14,6 +14,7 @@ import { CategoryDetailComponentModule } from './components/category-detail/cate
 import { EditCategoryComponentModule } from './components/edit-category/edit-category.component-module';
 import { CreateTaskComponentModule } from './components/create-task/create-task.component-module';
 import { EditTaskComponentModule } from './components/edit-task/edit-task.component-module';
+import { TeamMemberServiceModule } from './services/team-member.service-module';
 
 @NgModule({
   imports: [
@@ -29,6 +30,7 @@ import { EditTaskComponentModule } from './components/edit-task/edit-task.compon
     CategoriesComponentModule,
     CategoryServiceModule,
     TaskServiceModule,
+    TeamMemberServiceModule,
     CreateCategoryComponentModule,
     CategoryDetailComponentModule,
     EditCategoryComponentModule,

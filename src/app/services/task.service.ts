@@ -18,11 +18,11 @@ export class TaskService {
     return this._httpClient.get<TaskModel>(`${this._apiUrl}/${id}`);
   }
 
-  create(task: Omit<TaskModel, 'id' | 'teamMemberIds'>): Observable<TaskModel> {
+  create(task: Omit<TaskModel, 'id'>): Observable<TaskModel> {
     return this._httpClient.post<TaskModel>(this._apiUrl, task);
   }
 
-  update(id: string, task: Omit<TaskModel, 'id' | 'teamMemberIds'>): Observable<TaskModel> {
+  update(id: string, task: Omit<TaskModel, 'id'>): Observable<TaskModel> {
     return this._httpClient.put<TaskModel>(`${this._apiUrl}/${id}`, task);
   }
 

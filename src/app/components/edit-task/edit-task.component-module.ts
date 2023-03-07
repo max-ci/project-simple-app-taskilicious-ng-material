@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { EditTaskComponent } from './edit-task.component';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @NgModule({
   imports: [
@@ -17,6 +18,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     MatButtonModule,
     MatSelectModule,
     MatProgressSpinnerModule,
+    MatCheckboxModule,
   ],
   declarations: [EditTaskComponent],
   providers: [],
