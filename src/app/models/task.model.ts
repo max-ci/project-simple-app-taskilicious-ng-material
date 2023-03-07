@@ -3,4 +3,5 @@ export interface TaskModel {
   readonly name: string;
   readonly categoryId: string;
   readonly teamMemberIds: string[];
+  readonly imageUrl: string;
 }

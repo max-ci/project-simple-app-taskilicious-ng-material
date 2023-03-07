@@ -4,18 +4,22 @@ import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
   BehaviorSubject,
   Observable,
-  catchError,
-  take,
-  tap,
   Subject,
   Subscription,
+  catchError,
   switchMap,
+  take,
+  tap,
+  of,
 } from 'rxjs';
 import { CategoryModel } from '../../models/category.model';
 import { TeamMemberModel } from '../../models/team-member.model';
 import { CategoryService } from '../../services/category.service';
 import { TaskService } from '../../services/task.service';
 import { TeamMemberService } from '../../services/team-member.service';
+import { FileService } from '../../services/file.service';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { UploadcareFile } from '@uploadcare/upload-client';
 
 @Component({
   selector: 'app-create-task',
@@ -29,6 +33,7 @@ export class CreateTaskComponent {
     name: new FormControl(),
     categoryId: new FormControl(),
     teamMemberIds: new FormArray([]),
+    imageUrl: new FormControl(''),
   });
 
   private _loadingCreateTaskSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -39,6 +44,11 @@ export class CreateTaskComponent {
 
   private _categoriesSubject: Subject<CategoryModel[]> = new Subject<CategoryModel[]>();
   public categories$: Observable<CategoryModel[]> = this._categoriesSubject.asObservable();
+
+  private _imageToUploadPreview: Subject<SafeUrl> = new Subject<SafeUrl>();
+  public imageToUploadPreview$: Observable<SafeUrl> = this._imageToUploadPreview.asObservable();
+
+  private _imageToUpload: BehaviorSubject<File | null> = new BehaviorSubject<File | null>(null);
 
   private readonly _getCategoriesAndSetInitialValue$: Subscription = this._categoryService
     .getAll()
@@ -77,30 +87,48 @@ export class CreateTaskComponent {
     private _taskService: TaskService,
     private _router: Router,
     private _activatedRoute: ActivatedRoute,
-    private _teamMemberService: TeamMemberService
+    private _teamMemberService: TeamMemberService,
+    private _fileService: FileService,
+    private _sanitize: DomSanitizer
   ) {}
 
-  onFormSubmitted(form: FormGroup): void {
-    const teamMemberIds: string[] = form.value.teamMemberIds.reduce(
-      (acc: string[], curr: { [key: string]: true | null }) => {
-        for (let key in curr) {
-          if (curr[key] === true) {
-            acc.push(key);
-          }
-        }
-        return acc;
-      },
-      []
-    );
+  onFileChanged(event: any): void {
+    const file = event.target.files[0];
+    if (!file) {
+      return;
+    }
 
+    let fileReader: FileReader = new FileReader();
+    fileReader.onloadend = () => {
+      this._imageToUploadPreview.next(
+        this._sanitize.bypassSecurityTrustUrl(fileReader.result as string)
+      );
+      this._imageToUpload.next(file);
+    };
+
+    fileReader.readAsDataURL(file);
+  }
+
+  onFormSubmitted(form: FormGroup): void {
+    if (!form.valid) {
+      return;
+    }
     this._loadingCreateTaskSubject.next(true);
-    this._taskService
-      .create({
-        name: form.value.name,
-        categoryId: form.value.categoryId,
-        teamMemberIds: teamMemberIds,
-      })
+    const teamMemberIds: string[] = this.getAssignedTeamMembersToTask(form.value.teamMemberIds);
+
+    this._imageToUpload
       .pipe(
+        switchMap((imageToUpload: File | null) =>
+          imageToUpload ? this._fileService.upload(imageToUpload) : of(null)
+        ),
+        switchMap((image: UploadcareFile | null) =>
+          this._taskService.create({
+            name: form.value.name,
+            categoryId: form.value.categoryId,
+            teamMemberIds: teamMemberIds,
+            imageUrl: image ? (image.cdnUrl as string) : form.value.imageUrl,
+          })
+        ),
         take(1),
         catchError((err) => {
           this._loadingCreateTaskSubject.next(false);
@@ -110,5 +138,17 @@ export class CreateTaskComponent {
       .subscribe(() => {
         this._router.navigateByUrl(`/categories/${form.value.categoryId}`);
       });
+    return;
+  }
+
+  getAssignedTeamMembersToTask(teamMemberIds: { [key: string]: true | null }[]): string[] {
+    return teamMemberIds.reduce((acc: string[], curr: { [key: string]: true | null }) => {
+      for (let key in curr) {
+        if (curr[key] === true) {
+          acc.push(key);
+        }
+      }
+      return acc;
+    }, []);
   }
 }

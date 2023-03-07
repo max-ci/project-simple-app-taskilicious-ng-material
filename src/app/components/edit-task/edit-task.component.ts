@@ -1,13 +1,26 @@
 import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
 import { FormArray, FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { BehaviorSubject, catchError, Observable, switchMap, take, combineLatest, map } from 'rxjs';
+import {
+  BehaviorSubject,
+  catchError,
+  Observable,
+  switchMap,
+  take,
+  combineLatest,
+  map,
+  Subject,
+  of,
+} from 'rxjs';
 import { TaskModel } from '../../models/task.model';
 import { CategoryModel } from '../../models/category.model';
 import { TaskService } from '../../services/task.service';
 import { CategoryService } from '../../services/category.service';
 import { TeamMemberModel } from '../../models/team-member.model';
 import { TeamMemberService } from '../../services/team-member.service';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { FileService } from '../../services/file.service';
+import { UploadcareFile } from '@uploadcare/upload-client';
 
 @Component({
   selector: 'app-edit-task',
@@ -21,6 +34,7 @@ export class EditTaskComponent {
     name: new FormControl(),
     categoryId: new FormControl(),
     teamMemberIds: new FormArray([]),
+    imageUrl: new FormControl(),
   });
 
   private _loadingUpdateTaskSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(false);
@@ -31,6 +45,11 @@ export class EditTaskComponent {
   public loadingTaskAndTeamMembers$: Observable<boolean> =
     this._loadingTaskAndTeamMembersSubject.asObservable();
 
+  private _imageToUploadPreview: Subject<SafeUrl> = new Subject<SafeUrl>();
+  public imageToUploadPreview$: Observable<SafeUrl> = this._imageToUploadPreview.asObservable();
+
+  private _imageToUpload: BehaviorSubject<File | null> = new BehaviorSubject<File | null>(null);
+
   public teamMembers$: Observable<TeamMemberModel[]> = this._activatedRoute.params.pipe(
     switchMap((params: Params) =>
       combineLatest([this._taskService.getOne(params['id']), this._teamMemberService.getAll()])
@@ -38,6 +57,9 @@ export class EditTaskComponent {
     take(1),
     map(([task, teamMembers]: [TaskModel, TeamMemberModel[]]) => {
       this.form.patchValue(task);
+      if (task.imageUrl) {
+        this._imageToUploadPreview.next(this._sanitize.bypassSecurityTrustUrl(task.imageUrl));
+      }
 
       teamMembers.forEach((teamMember: TeamMemberModel) => {
         const teamMemberTask = task.teamMemberIds?.includes(teamMember.id) ? true : null;
@@ -66,30 +88,49 @@ export class EditTaskComponent {
     private _router: Router,
     private _taskService: TaskService,
     private _teamMemberService: TeamMemberService,
-    private _categoryService: CategoryService
+    private _categoryService: CategoryService,
+    private _fileService: FileService,
+    private _sanitize: DomSanitizer
   ) {}
 
-  onFormSubmitted(form: FormGroup): void {
-    const teamMemberIds: string[] = form.value.teamMemberIds.reduce(
-      (acc: string[], curr: { [key: string]: true | null }) => {
-        for (let key in curr) {
-          if (curr[key] === true) {
-            acc.push(key);
-          }
-        }
-        return acc;
-      },
-      []
-    );
+  onFileChanged(event: any): void {
+    const file = event.target.files[0];
+    if (!file) {
+      return;
+    }
 
+    let fileReader: FileReader = new FileReader();
+    fileReader.onloadend = () => {
+      this._imageToUploadPreview.next(
+        this._sanitize.bypassSecurityTrustUrl(fileReader.result as string)
+      );
+      this._imageToUpload.next(file);
+    };
+
+    fileReader.readAsDataURL(file);
+  }
+
+  onFormSubmitted(form: FormGroup): void {
+    if (!form.valid) {
+      return;
+    }
     this._loadingUpdateTaskSubject.next(true);
-    this._activatedRoute.params
+    const teamMemberIds: string[] = this.getAssignedTeamMembersToTask(form.value.teamMemberIds);
+
+    this._imageToUpload
       .pipe(
-        switchMap((params: Params) =>
+        switchMap((imageToUpload: File | null) =>
+          combineLatest([
+            this._activatedRoute.params,
+            imageToUpload ? this._fileService.upload(imageToUpload) : of(null),
+          ])
+        ),
+        switchMap(([params, image]: [Params, UploadcareFile | null]) =>
           this._taskService.update(params['id'], {
             name: form.value.name,
             categoryId: form.value.categoryId,
             teamMemberIds: teamMemberIds,
+            imageUrl: image ? (image.cdnUrl as string) : form.value.imageUrl,
           })
         ),
         take(1),
@@ -101,5 +142,16 @@ export class EditTaskComponent {
       .subscribe(() => {
         this._router.navigateByUrl(`categories/${form.value.categoryId}`);
       });
+  }
+
+  getAssignedTeamMembersToTask(teamMemberIds: { [key: string]: true | null }[]): string[] {
+    return teamMemberIds.reduce((acc: string[], curr: { [key: string]: true | null }) => {
+      for (let key in curr) {
+        if (curr[key] === true) {
+          acc.push(key);
+        }
+      }
+      return acc;
+    }, []);
   }
 }

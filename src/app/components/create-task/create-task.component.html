@@ -37,7 +37,14 @@
   </ng-container>
 
   <div>
-    <button type="submit" mat-raised-button color="primary" [disabled]="form.invalid">
+    <ng-container *ngIf="imageToUploadPreview$ | async as imageUrl"
+      ><img [src]="imageUrl" width="200"
+    /></ng-container>
+    <input type="file" accept="image/*" (change)="onFileChanged($event)" />
+  </div>
+
+  <div>
+    <button type="submit" mat-raised-button color="primary" [disabled]="loadingCreateTask$ | async">
       Create
     </button>
   </div>
