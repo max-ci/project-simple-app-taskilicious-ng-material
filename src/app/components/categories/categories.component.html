@@ -1,31 +1,51 @@
-<h1>Welcome to Taskilicious</h1>
-<h2>Choose a category</h2>
+<mat-card>
+  <mat-card-title>Welcome to Taskilicious </mat-card-title>
+  <mat-card-subtitle>Choose a category</mat-card-subtitle>
 
-<mat-form-field appearance="fill">
-  <mat-label>Order by name</mat-label>
-  <mat-select
-    [formControl]="orderByNameSelect"
-    (selectionChange)="onOrderByNameSelectionChanged($event)">
-    <mat-option *ngFor="let item of ordersByName | async" [value]="item">
-      {{ item }}
-    </mat-option>
-  </mat-select>
-</mat-form-field>
+  <mat-form-field appearance="outline">
+    <mat-label>Order by name</mat-label>
+    <mat-select
+      [formControl]="orderByNameSelect"
+      (selectionChange)="onOrderByNameSelectionChanged($event)">
+      <mat-option *ngFor="let item of ordersByName | async" [value]="item">
+        {{ item }}
+      </mat-option>
+    </mat-select>
+  </mat-form-field>
 
-<ng-container *ngIf="loading$ | async">
-  <mat-progress-spinner [color]="'primary'" [mode]="'indeterminate'" [value]="50" [diameter]="50">
-  </mat-progress-spinner>
-</ng-container>
+  <ng-container *ngIf="categories$ | async as categories; else loading">
+    <mat-list role="list" *ngIf="categories.length; else empty" class="mb-1">
+      <ng-container *ngFor="let item of categories">
+        <mat-list-item role="listitem">
+          <div class="categories-list-item">
+            <a routerLink="/categories/{{ item.id }}" class="categories-list-item-link">{{
+              item.name
+            }}</a>
+            <a
+              mat-mini-fab
+              [color]="'primary'"
+              routerLink="/categories/edit/{{ item.id }}"
+              class="categories-list-item-edit">
+              <mat-icon>edit</mat-icon>
+            </a>
+          </div>
+        </mat-list-item>
+        <mat-divider></mat-divider>
+      </ng-container>
+    </mat-list>
+  </ng-container>
 
-<ng-container *ngIf="categories$ | async as categories">
-  <mat-list role="list" *ngIf="categories.length; else empty"
-    ><mat-list-item role="listitem" *ngFor="let item of categories"
-      ><span routerLink="/categories/{{ item.id }}">{{ item.name }}</span>
-      <mat-icon routerLink="/categories/edit/{{ item.id }}">edit</mat-icon>
-    </mat-list-item></mat-list
-  >
-</ng-container>
+  <ng-template #loading>
+    <mat-progress-spinner
+      [color]="'primary'"
+      [mode]="'indeterminate'"
+      [value]="50"
+      [diameter]="30"
+      class="mb-1">
+    </mat-progress-spinner>
+  </ng-template>
 
-<ng-template #empty> <div>0 categories</div> </ng-template>
+  <ng-template #empty> <div class="empty-state mb-1">No categories</div> </ng-template>
 
-<button mat-mini-fab routerLink="/categories/create"><mat-icon>add</mat-icon></button>
+  <button mat-mini-fab routerLink="/categories/create"><mat-icon>add</mat-icon></button>
+</mat-card>

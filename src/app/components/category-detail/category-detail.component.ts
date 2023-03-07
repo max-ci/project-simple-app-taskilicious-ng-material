@@ -1,4 +1,11 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, ViewEncapsulation } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  OnDestroy,
+  TemplateRef,
+  ViewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import {
   BehaviorSubject,
@@ -9,8 +16,11 @@ import {
   switchMap,
   take,
   takeUntil,
-  tap,
   catchError,
+  of,
+  EMPTY,
+  filter,
+  tap,
 } from 'rxjs';
 import { CategoryModel } from '../../models/category.model';
 import { TaskModel } from '../../models/task.model';
@@ -19,6 +29,8 @@ import { TaskService } from '../../services/task.service';
 import { TeamMemberService } from '../../services/team-member.service';
 import { TeamMemberModel } from '../../models/team-member.model';
 import { TaskWithTeamMembersModel } from '../../models/task-with-team-members.model';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Dialog, DialogRef } from '@angular/cdk/dialog';
 
 @Component({
   selector: 'app-category-detail',
@@ -28,13 +40,9 @@ import { TaskWithTeamMembersModel } from '../../models/task-with-team-members.mo
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CategoryDetailComponent implements OnDestroy {
+  @ViewChild('deleteDialogTemplate') deleteDialogTemplate!: TemplateRef<any>;
+
   private _destroySubject: Subject<void> = new Subject<void>();
-
-  private _loadingCategorySubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
-  public loadingCategory$: Observable<boolean> = this._loadingCategorySubject.asObservable();
-
-  private _loadingTasksSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
-  public loadingTasks$: Observable<boolean> = this._loadingTasksSubject.asObservable();
 
   private _loadingDeleteTask: BehaviorSubject<string | null> = new BehaviorSubject<string | null>(
     null
@@ -44,8 +52,10 @@ export class CategoryDetailComponent implements OnDestroy {
   readonly category$: Observable<CategoryModel> = this._activatedRoute.params.pipe(
     switchMap((params: Params) => this._categoryService.getOne(params['id'])),
     take(1),
-    tap(() => {
-      this._loadingCategorySubject.next(false);
+    catchError(() => {
+      this._showMessage(`Category doesn't exist or an error occurred`);
+      this._router.navigateByUrl('');
+      return EMPTY;
     })
   );
 
@@ -55,8 +65,9 @@ export class CategoryDetailComponent implements OnDestroy {
     this._teamMemberService.getAll(),
   ]).pipe(
     takeUntil(this._destroySubject),
-    map(([params, tasks, teamMembers]: [Params, TaskModel[], TeamMemberModel[]]) =>
-      tasks
+    map(([params, tasks, teamMembers]: [Params, TaskModel[], TeamMemberModel[]]) => {
+      this._loadingDeleteTask.next(null);
+      return tasks
         .filter((task: TaskModel) => task.categoryId === params['id'])
         .map((task: TaskModel) => {
           const teamMembersAssignedToTask: TeamMemberModel[] = Array.isArray(task?.teamMemberIds)
@@ -64,12 +75,12 @@ export class CategoryDetailComponent implements OnDestroy {
                 return task.teamMemberIds.includes(teamMember.id);
               })
             : [];
-
           return { ...task, teamMembers: teamMembersAssignedToTask };
-        })
-    ),
-    tap(() => {
-      this._loadingTasksSubject.next(false);
+        });
+    }),
+    catchError(() => {
+      this._showMessage('An error occurred');
+      return of([]);
     })
   );
 
@@ -85,7 +96,10 @@ export class CategoryDetailComponent implements OnDestroy {
     private _categoryService: CategoryService,
     private _taskService: TaskService,
     private _teamMemberService: TeamMemberService,
-    private _router: Router
+    private _router: Router,
+    private _snackbar: MatSnackBar,
+    private _dialog: Dialog,
+    public dialogRef: DialogRef<boolean>
   ) {}
 
   ngOnDestroy(): void {
@@ -93,20 +107,30 @@ export class CategoryDetailComponent implements OnDestroy {
     this._destroySubject.complete();
   }
 
-  deleteTask(id: string): void {
-    this._loadingDeleteTask.next(id);
-    this._taskService
-      .delete(id)
+  deleteTask(id: string, name: string): void {
+    this.dialogRef = this._dialog.open(this.deleteDialogTemplate, {
+      data: {
+        taskName: name,
+      },
+    });
+
+    this.dialogRef.closed
       .pipe(
+        filter((result: boolean | undefined) => (typeof result === 'undefined' ? false : result)),
+        tap(() => {
+          this._loadingDeleteTask.next(id);
+        }),
+        switchMap(() => this._taskService.delete(id).pipe()),
         take(1),
-        catchError((err) => {
+        catchError(() => {
           this._loadingDeleteTask.next(null);
-          throw err;
+          this._showMessage('An error occurred');
+          return EMPTY;
         })
       )
       .subscribe(() => {
-        this._loadingDeleteTask.next(null);
         this._refreshTaskSubject.next();
+        this._showMessage('Task deleted');
       });
   }
 
@@ -125,5 +149,11 @@ export class CategoryDetailComponent implements OnDestroy {
 
   taskTrackBy(index: number, task: TaskModel): string {
     return task.id;
+  }
+
+  private _showMessage(message: string): void {
+    this._snackbar.open(message, undefined, {
+      duration: 3000,
+    });
   }
 }

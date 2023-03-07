@@ -1,0 +1,29 @@
+.tasks-table {
+  width: 100%;
+
+  td {
+    padding: 0.5rem 1rem;
+  }
+
+  th {
+    padding: 0 1rem;
+  }
+
+  &-avatars {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+
+    img {
+      border-radius: 0.25rem;
+      width: 30px;
+      height: auto;
+    }
+  }
+
+  &-image {
+    border-radius: 0.25rem;
+    width: 60px;
+    height: auto;
+  }
+}

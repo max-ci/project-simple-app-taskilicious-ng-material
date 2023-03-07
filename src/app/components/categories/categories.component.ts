@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnDestroy, ViewEncapsulation } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { BehaviorSubject, Observable, Subject, combineLatest, of, tap, map } from 'rxjs';
+import { BehaviorSubject, Observable, Subject, combineLatest, of, map, catchError } from 'rxjs';
 import { CategoryModel } from '../../models/category.model';
 import { CategoryService } from '../../services/category.service';
-import { OrderByName } from '../../enum/order-by-name.enum';
+import { OrderByNameEnum } from '../../enum/order-by-name.enum';
 import { MatSelectChange } from '@angular/material/select';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-categories',
@@ -13,38 +14,39 @@ import { MatSelectChange } from '@angular/material/select';
   encapsulation: ViewEncapsulation.Emulated,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CategoriesComponent {
+export class CategoriesComponent implements OnDestroy {
   private _destroySubject: Subject<void> = new Subject<void>();
 
-  private _loadingSubject: BehaviorSubject<boolean> = new BehaviorSubject<boolean>(true);
-  public loading$: Observable<boolean> = this._loadingSubject.asObservable();
+  private readonly _orderByNameDefaultValue: OrderByNameEnum = OrderByNameEnum.Asc;
 
-  private readonly _orderByNameDefaultValue: OrderByName = OrderByName.Asc;
+  private _orderByNameSubject: BehaviorSubject<OrderByNameEnum | null> =
+    new BehaviorSubject<OrderByNameEnum | null>(this._orderByNameDefaultValue);
+  public orderByName$: Observable<OrderByNameEnum | null> = this._orderByNameSubject.asObservable();
 
-  private _orderByNameSubject: BehaviorSubject<OrderByName | null> =
-    new BehaviorSubject<OrderByName | null>(this._orderByNameDefaultValue);
-  public orderByName$: Observable<OrderByName | null> = this._orderByNameSubject.asObservable();
-
-  public ordersByName: Observable<OrderByName[]> = of([OrderByName.Asc, OrderByName.Desc]);
+  public ordersByName: Observable<OrderByNameEnum[]> = of([
+    OrderByNameEnum.Asc,
+    OrderByNameEnum.Desc,
+  ]);
   public orderByNameSelect: FormControl = new FormControl(this._orderByNameDefaultValue);
 
   readonly categories$: Observable<CategoryModel[]> = combineLatest([
     this.orderByName$,
     this._categoryService.getAll(),
   ]).pipe(
-    map(([order, categories]: [OrderByName | null, CategoryModel[]]) =>
+    map(([order, categories]: [OrderByNameEnum | null, CategoryModel[]]) =>
       categories.sort((category1: CategoryModel, category2: CategoryModel) =>
-        order === OrderByName.Desc
+        order === OrderByNameEnum.Desc
           ? category2.name.localeCompare(category1.name)
           : category1.name.localeCompare(category2.name)
       )
     ),
-    tap(() => {
-      this._loadingSubject.next(false);
+    catchError(() => {
+      this._showMessage('An error occurred');
+      return of([]);
     })
   );
 
-  constructor(private _categoryService: CategoryService) {}
+  constructor(private _categoryService: CategoryService, private _snackbar: MatSnackBar) {}
 
   ngOnDestroy(): void {
     this._destroySubject.next();
@@ -53,5 +55,11 @@ export class CategoriesComponent {
 
   onOrderByNameSelectionChanged(event: MatSelectChange): void {
     this._orderByNameSubject.next(event.value);
+  }
+
+  private _showMessage(message: string): void {
+    this._snackbar.open(message, undefined, {
+      duration: 3000,
+    });
   }
 }

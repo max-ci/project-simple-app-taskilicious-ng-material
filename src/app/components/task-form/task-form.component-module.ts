@@ -4,10 +4,15 @@ import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
-import { CreateTaskComponent } from './create-task.component';
+import { TaskFormComponent } from './task-form.component';
 import { MatSelectModule } from '@angular/material/select';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatCardModule } from '@angular/material/card';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { GoBackDirectiveModule } from '../../directives/go-back.module';
 
 @NgModule({
   imports: [
@@ -19,9 +24,14 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
     MatSelectModule,
     MatProgressSpinnerModule,
     MatCheckboxModule,
+    MatCardModule,
+    MatSnackBarModule,
+    MatIconModule,
+    MatProgressBarModule,
+    GoBackDirectiveModule,
   ],
-  declarations: [CreateTaskComponent],
+  declarations: [TaskFormComponent],
   providers: [],
-  exports: [CreateTaskComponent],
+  exports: [TaskFormComponent],
 })
-export class CreateTaskComponentModule {}
+export class TaskFormComponentModule {}
